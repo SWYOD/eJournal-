@@ -6,10 +6,11 @@ import {InjectModel} from "@nestjs/sequelize";
 
 @Injectable()
 export class StudentsService {
-  constructor(@InjectModel(Student) private readonly studentModel: typeof Student,) {
+  constructor(@InjectModel(Student)
+              private readonly studentModel: typeof Student) {
   }
   async create(createStudentDto: CreateStudentDto) {
-    return await this.studentModel.create(createStudentDto);
+      return await this.studentModel.create(createStudentDto as Student);
   }
 
   findAll() {
