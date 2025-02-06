@@ -10,22 +10,25 @@ export class StudentsService {
               private readonly studentModel: typeof Student) {
   }
   async create(createStudentDto: CreateStudentDto) {
+
       return await this.studentModel.create(createStudentDto as Student);
   }
 
-  findAll() {
-    return `This action returns all students`;
+  async findAll() {
+    return await this.studentModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} student`;
+  async findOne(id: number) {
+    return await this.studentModel.findByPk(id);
   }
 
-  update(id: number, updateStudentDto: UpdateStudentDto) {
-    return `This action updates a #${id} student`;
+  async update(id: number, updateStudentDto: UpdateStudentDto) {
+    const student = await this.findOne(id);
+    return student?.update(updateStudentDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} student`;
+  async remove(id: number) {
+    const student = await this.findOne(id);
+    return student?.destroy();
   }
 }
