@@ -16,9 +16,8 @@ export class Subject extends Model<Subject> {
     type: DataType.STRING,
   })
   name: string;
-
   @Column({
-    type: DataType.DATE,
+    type: DataType.STRING,
   })
-  subjDate: Date;
+  type: string;
 }

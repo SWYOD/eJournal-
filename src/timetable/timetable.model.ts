@@ -11,4 +11,9 @@ export class Timetable extends Model<Timetable> {
     primaryKey: true,
   })
   id: number;
+
+  @Column({
+    type: DataType.DATE,
+  })
+  subjDate: Date;
 }

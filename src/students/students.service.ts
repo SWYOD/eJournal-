@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { CreateStudentDto } from './dto/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import {Injectable} from '@nestjs/common';
+import {CreateStudentDto} from './dto/create-student.dto';
+import {UpdateStudentDto} from './dto/update-student.dto';
+import {Student} from "./students.model";
+import {InjectModel} from "@nestjs/sequelize";
 
 @Injectable()
 export class StudentsService {
-  create(createStudentDto: CreateStudentDto) {
-    return 'This action adds a new student';
+  constructor(@InjectModel(Student) private readonly studentModel: typeof Student,) {
+  }
+  async create(createStudentDto: CreateStudentDto) {
+    return await this.studentModel.create(createStudentDto);
   }
 
   findAll() {
