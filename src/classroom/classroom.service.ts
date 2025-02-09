@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { CreateClassroomDto } from './dto/create-classroom.dto';
-import { UpdateClassroomDto } from './dto/update-classroom.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { Classroom } from './сlassroom.model';
+import { CreateClassroomDto, UpdateClassroomDto } from './dto/create-classroom.dto';
 
 @Injectable()
 export class ClassroomService {
-  create(createClassroomDto: CreateClassroomDto) {
-    return 'This action adds a new classroom';
+  constructor(
+      @InjectModel(Classroom)
+      private readonly classroomModel: typeof Classroom,
+  ) {}
+
+  async create(createClassroomDto: CreateClassroomDto): Promise<Classroom> {
+    return await this.classroomModel.create(createClassroomDto as Classroom);
   }
 
-  findAll() {
-    return `This action returns all classroom`;
+  async findAll(): Promise<Classroom[]> {
+    return await this.classroomModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} classroom`;
+  async findOne(id: number): Promise<Classroom | null> {
+    return await this.classroomModel.findByPk(id);
   }
 
-  update(id: number, updateClassroomDto: UpdateClassroomDto) {
-    return `This action updates a #${id} classroom`;
+  async update(id: number, updateClassroomDto: UpdateClassroomDto): Promise<[number, Classroom[]]> {
+    return await this.classroomModel.update(updateClassroomDto, {
+      where: { id },
+      returning: true,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} classroom`;
+  async remove(id: number): Promise<number> {
+    return await this.classroomModel.destroy({ where: { id } });
   }
 }

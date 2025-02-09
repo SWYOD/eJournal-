@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTeacherDto } from './dto/create-teacher.dto';
-import { UpdateTeacherDto } from './dto/update-teacher.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Teacher } from './teachers.model';
+import { CreateTeacherDto, UpdateTeacherDto } from './dto/teacher.dto';
 
 @Injectable()
 export class TeachersService {
-  create(createTeacherDto: CreateTeacherDto) {
-    return 'This action adds a new teacher';
+  constructor(
+      @InjectModel(Teacher)
+      private readonly teacherModel: typeof Teacher,
+  ) {}
+
+  async create(createTeacherDto: CreateTeacherDto): Promise<Teacher> {
+    return await this.teacherModel.create(createTeacherDto as Teacher);
   }
 
-  findAll() {
-    return `This action returns all teachers`;
+  async findAll(): Promise<Teacher[]> {
+    return await this.teacherModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} teacher`;
+  async findOne(id: number): Promise<Teacher> {
+    const teacher = await this.teacherModel.findByPk(id);
+    if (!teacher) {
+      throw new NotFoundException(`Учитель с ID ${id} не найден`);
+    }
+    return teacher;
   }
 
-  update(id: number, updateTeacherDto: UpdateTeacherDto) {
-    return `This action updates a #${id} teacher`;
+  async update(id: number, updateTeacherDto: UpdateTeacherDto): Promise<Teacher> {
+    const teacher = await this.findOne(id);
+    await teacher.update(updateTeacherDto);
+    return teacher;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} teacher`;
+  async remove(id: number): Promise<void> {
+    const teacher = await this.findOne(id);
+    await teacher.destroy();
   }
 }

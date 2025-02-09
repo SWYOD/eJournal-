@@ -1,34 +1,49 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SubjectService } from './subject.service';
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { CreateSubjectDto, UpdateSubjectDto } from './dto/subject.dto';
+import { Subject } from './subject.model';
 
-@Controller('subject')
+@ApiTags('Subjects')
+@Controller('subjects')
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 
+  @ApiOperation({ summary: 'Создание предмета' })
+  @ApiResponse({ status: 201, description: 'Предмет успешно создан', type: Subject })
   @Post()
-  create(@Body() createSubjectDto: CreateSubjectDto) {
+  async create(@Body() createSubjectDto: CreateSubjectDto): Promise<Subject> {
     return this.subjectService.create(createSubjectDto);
   }
 
+  @ApiOperation({ summary: 'Получение всех предметов' })
+  @ApiResponse({ status: 200, description: 'Возвращает список предметов', type: [Subject] })
   @Get()
-  findAll() {
+  async findAll(): Promise<Subject[]> {
     return this.subjectService.findAll();
   }
 
+  @ApiOperation({ summary: 'Получение предмета по ID' })
+  @ApiResponse({ status: 200, description: 'Предмет найден', type: Subject })
+  @ApiResponse({ status: 404, description: 'Предмет не найден' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.subjectService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Subject> {
+    return this.subjectService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Обновление предмета' })
+  @ApiResponse({ status: 200, description: 'Предмет обновлён', type: Subject })
+  @ApiResponse({ status: 404, description: 'Предмет не найден' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubjectDto: UpdateSubjectDto) {
-    return this.subjectService.update(+id, updateSubjectDto);
+  async update(@Param('id') id: number, @Body() updateSubjectDto: UpdateSubjectDto): Promise<Subject> {
+    return this.subjectService.update(id, updateSubjectDto);
   }
 
+  @ApiOperation({ summary: 'Удаление предмета' })
+  @ApiResponse({ status: 200, description: 'Предмет удалён' })
+  @ApiResponse({ status: 404, description: 'Предмет не найден' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.subjectService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return this.subjectService.remove(id);
   }
 }

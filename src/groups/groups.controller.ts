@@ -1,34 +1,49 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GroupsService } from './groups.service';
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
+import { CreateGroupDto, UpdateGroupDto } from './dto/create-group.dto';
+import { Group } from './groups.model';
 
+@ApiTags('Groups')
 @Controller('groups')
 export class GroupsController {
-  constructor(private readonly groupsService: GroupsService) {}
+  constructor(private readonly groupService: GroupsService) {}
 
+  @ApiOperation({ summary: 'Создание группы' })
+  @ApiResponse({ status: 201, description: 'Группа успешно создана', type: Group })
   @Post()
-  create(@Body() createGroupDto: CreateGroupDto) {
-    return this.groupsService.create(createGroupDto);
+  async create(@Body() createGroupDto: CreateGroupDto): Promise<Group> {
+    return this.groupService.create(createGroupDto);
   }
 
+  @ApiOperation({ summary: 'Получение всех групп' })
+  @ApiResponse({ status: 200, description: 'Возвращает список групп', type: [Group] })
   @Get()
-  findAll() {
-    return this.groupsService.findAll();
+  async findAll(): Promise<Group[]> {
+    return this.groupService.findAll();
   }
 
+  @ApiOperation({ summary: 'Получение группы по ID' })
+  @ApiResponse({ status: 200, description: 'Группа найдена', type: Group })
+  @ApiResponse({ status: 404, description: 'Группа не найдена' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.groupsService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Group> {
+    return this.groupService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Обновление группы' })
+  @ApiResponse({ status: 200, description: 'Группа обновлена', type: Group })
+  @ApiResponse({ status: 404, description: 'Группа не найдена' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
-    return this.groupsService.update(+id, updateGroupDto);
+  async update(@Param('id') id: number, @Body() updateGroupDto: UpdateGroupDto): Promise<Group> {
+    return this.groupService.update(id, updateGroupDto);
   }
 
+  @ApiOperation({ summary: 'Удаление группы' })
+  @ApiResponse({ status: 200, description: 'Группа удалена' })
+  @ApiResponse({ status: 404, description: 'Группа не найдена' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.groupsService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return this.groupService.remove(id);
   }
 }

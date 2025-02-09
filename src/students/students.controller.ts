@@ -1,34 +1,49 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StudentsService } from './students.service';
-import { CreateStudentDto } from './dto/create-student.dto';
-import { UpdateStudentDto } from './dto/update-student.dto';
+import { CreateStudentDto, UpdateStudentDto } from './dto/create-student.dto';
+import { Student } from './students.model';
 
+@ApiTags('Students')
 @Controller('students')
-export class StudentsController {
-  constructor(private readonly studentsService: StudentsService) {}
+export class StudentController {
+  constructor(private readonly studentService: StudentsService) {}
 
+  @ApiOperation({ summary: 'Создание студента' })
+  @ApiResponse({ status: 201, description: 'Студент успешно создан', type: Student })
   @Post()
-  create(@Body() createStudentDto: CreateStudentDto) {
-    return this.studentsService.create(createStudentDto);
+  async create(@Body() createStudentDto: CreateStudentDto): Promise<Student> {
+    return this.studentService.create(createStudentDto);
   }
 
+  @ApiOperation({ summary: 'Получение всех студентов' })
+  @ApiResponse({ status: 200, description: 'Возвращает список студентов', type: [Student] })
   @Get()
-  findAll() {
-    return this.studentsService.findAll();
+  async findAll(): Promise<Student[]> {
+    return this.studentService.findAll();
   }
 
+  @ApiOperation({ summary: 'Получение студента по ID' })
+  @ApiResponse({ status: 200, description: 'Студент найден', type: Student })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.studentsService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Student> {
+    return this.studentService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Обновление студента' })
+  @ApiResponse({ status: 200, description: 'Студент обновлён', type: Student })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
-    return this.studentsService.update(+id, updateStudentDto);
+  async update(@Param('id') id: number, @Body() updateStudentDto: UpdateStudentDto): Promise<Student> {
+    return this.studentService.update(id, updateStudentDto);
   }
 
+  @ApiOperation({ summary: 'Удаление студента' })
+  @ApiResponse({ status: 200, description: 'Студент удалён' })
+  @ApiResponse({ status: 404, description: 'Студент не найден' })
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.studentsService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return this.studentService.remove(id);
   }
 }

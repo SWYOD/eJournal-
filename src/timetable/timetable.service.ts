@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTimetableDto } from './dto/create-timetable.dto';
-import { UpdateTimetableDto } from './dto/update-timetable.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Timetable } from './timetable.model';
+import { CreateTimetableDto, UpdateTimetableDto } from './dto/timetable.dto';
 
 @Injectable()
 export class TimetableService {
-  create(createTimetableDto: CreateTimetableDto) {
-    return 'This action adds a new timetable';
+  constructor(
+      @InjectModel(Timetable)
+      private readonly timetableModel: typeof Timetable,
+  ) {}
+
+  async create(createTimetableDto: CreateTimetableDto): Promise<Timetable> {
+    return await this.timetableModel.create(createTimetableDto as Timetable);
   }
 
-  findAll() {
-    return `This action returns all timetable`;
+  async findAll(): Promise<Timetable[]> {
+    return await this.timetableModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} timetable`;
+  async findOne(id: number): Promise<Timetable> {
+    const timetable = await this.timetableModel.findByPk(id);
+    if (!timetable) {
+      throw new NotFoundException(`Запись расписания с ID ${id} не найдена`);
+    }
+    return timetable;
   }
 
-  update(id: number, updateTimetableDto: UpdateTimetableDto) {
-    return `This action updates a #${id} timetable`;
+  async update(id: number, updateTimetableDto: UpdateTimetableDto): Promise<Timetable> {
+    const timetable = await this.findOne(id);
+    await timetable.update(updateTimetableDto);
+    return timetable;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} timetable`;
+  async remove(id: number): Promise<void> {
+    const timetable = await this.findOne(id);
+    await timetable.destroy();
   }
 }

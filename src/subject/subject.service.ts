@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { CreateSubjectDto } from './dto/create-subject.dto';
-import { UpdateSubjectDto } from './dto/update-subject.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Subject } from './subject.model';
+import { CreateSubjectDto, UpdateSubjectDto } from './dto/subject.dto';
 
 @Injectable()
 export class SubjectService {
-  create(createSubjectDto: CreateSubjectDto) {
-    return 'This action adds a new subject';
+  constructor(
+      @InjectModel(Subject)
+      private readonly subjectModel: typeof Subject,
+  ) {}
+
+  async create(createSubjectDto: CreateSubjectDto): Promise<Subject> {
+    return await this.subjectModel.create(createSubjectDto as Subject);
   }
 
-  findAll() {
-    return `This action returns all subject`;
+  async findAll(): Promise<Subject[]> {
+    return await this.subjectModel.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} subject`;
+  async findOne(id: number): Promise<Subject> {
+    const subject = await this.subjectModel.findByPk(id);
+    if (!subject) {
+      throw new NotFoundException(`Предмет с ID ${id} не найден`);
+    }
+    return subject;
   }
 
-  update(id: number, updateSubjectDto: UpdateSubjectDto) {
-    return `This action updates a #${id} subject`;
+  async update(id: number, updateSubjectDto: UpdateSubjectDto): Promise<Subject> {
+    const subject = await this.findOne(id);
+    await subject.update(updateSubjectDto);
+    return subject;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subject`;
+  async remove(id: number): Promise<void> {
+    const subject = await this.findOne(id);
+    await subject.destroy();
   }
 }
