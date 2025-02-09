@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Classroom } from './сlassroom.model';
-import { CreateClassroomDto, UpdateClassroomDto } from './dto/create-classroom.dto';
+import { CreateClassroomDto, UpdateClassroomDto } from './dto/classroom.dto';
 
 @Injectable()
 export class ClassroomService {
@@ -18,18 +18,22 @@ export class ClassroomService {
     return await this.classroomModel.findAll();
   }
 
-  async findOne(id: number): Promise<Classroom | null> {
-    return await this.classroomModel.findByPk(id);
+  async findOne(id: number): Promise<Classroom> {
+    const classroom = await this.classroomModel.findByPk(id);
+    if (!classroom) {
+      throw new NotFoundException(`Аудитория с ID ${id} не найдена`);
+    }
+    return classroom;
   }
 
-  async update(id: number, updateClassroomDto: UpdateClassroomDto): Promise<[number, Classroom[]]> {
-    return await this.classroomModel.update(updateClassroomDto, {
-      where: { id },
-      returning: true,
-    });
+  async update(id: number, updateClassroomDto: UpdateClassroomDto): Promise<Classroom> {
+    const classroom = await this.findOne(id);
+    await classroom.update(updateClassroomDto);
+    return classroom;
   }
 
-  async remove(id: number): Promise<number> {
-    return await this.classroomModel.destroy({ where: { id } });
+  async remove(id: number): Promise<void> {
+    const classroom = await this.findOne(id);
+    await classroom.destroy();
   }
 }

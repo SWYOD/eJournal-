@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, Min } from 'class-validator';
+import { IsInt, Min, IsOptional } from 'class-validator';
 
 export class CreateClassroomDto {
     @ApiProperty({
@@ -24,6 +24,7 @@ export class UpdateClassroomDto {
         description: 'Номер аудитории',
         required: false,
     })
+    @IsOptional()
     @IsInt({ message: 'Номер должен быть целым числом' })
     number?: number;
 
@@ -32,6 +33,7 @@ export class UpdateClassroomDto {
         description: 'Вместимость аудитории',
         required: false,
     })
+    @IsOptional()
     @IsInt({ message: 'Вместимость должна быть целым числом' })
     @Min(1, { message: 'Вместимость должна быть минимум 1' })
     capacity?: number;

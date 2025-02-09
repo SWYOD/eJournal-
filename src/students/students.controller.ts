@@ -6,7 +6,7 @@ import { Student } from './students.model';
 
 @ApiTags('Students')
 @Controller('students')
-export class StudentController {
+export class StudentsController {
   constructor(private readonly studentService: StudentsService) {}
 
   @ApiOperation({ summary: 'Создание студента' })
