@@ -19,7 +19,11 @@ export class TimetableService {
   }
 
   async findOne(id: number): Promise<Timetable> {
-    const timetable = await this.timetableModel.findByPk(id);
+    const timetable = await this.timetableModel.findByPk(id, {
+      include:{
+        all:true
+      }
+    });
     if (!timetable) {
       throw new NotFoundException(`Запись расписания с ID ${id} не найдена`);
     }
