@@ -10,6 +10,11 @@ import { GroupsModule } from './groups/groups.module';
 import { ClassroomModule } from './classroom/classroom.module';
 import { Student } from './students/students.model';
 import { Group } from './groups/groups.model';
+import {Timetable} from "./timetable/timetable.model";
+
+import {Teacher} from "./teachers/teachers.model";
+import {Subject} from "./subject/subject.model";
+import {Classroom} from "./classroom/сlassroom.model";
 
 @Module({
   imports: [
@@ -20,7 +25,7 @@ import { Group } from './groups/groups.model';
       username: 'ejournal',
       password: 'D%ia_.yY6Ze\\!#',
       database: 'ejournal',
-      models: [Student, Group],
+      models: [Student, Group,Timetable,Subject,Teacher, Classroom],
       autoLoadModels: true,
     }),
     StudentsModule,

@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {Column, DataType, HasMany, HasOne, Model, Table} from 'sequelize-typescript';
+import {Timetable} from "../timetable/timetable.model";
 
 @Table({
   tableName: 'classroom',
@@ -21,4 +22,6 @@ export class Classroom extends Model<Classroom> {
     type: DataType.INTEGER,
   })
   capacity: number;
+  @HasMany(() => Timetable)
+  timetable: Timetable;
 }

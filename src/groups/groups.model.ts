@@ -1,5 +1,6 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
 import { Student } from '../students/students.model';
+import {Timetable} from "../timetable/timetable.model";
 
 @Table({
   tableName: 'groups',
@@ -21,8 +22,10 @@ export class Group extends Model<Group> {
   @Column({
     type: DataType.INTEGER,
   })
-  studCount: number;
+  studentCount: number;
 
   @HasMany(() => Student)
   students: Student[];
+  @HasMany(() => Timetable)
+  timetables: Timetable[];
 }

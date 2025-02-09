@@ -10,7 +10,7 @@ export class CreateGroupDto {
     @ApiProperty({ example: 25, description: 'Количество студентов в группе' })
     @IsInt({ message: 'Количество студентов должно быть целым числом' })
     @Min(1, { message: 'Минимальное количество студентов - 1' })
-    studCount: number;
+    studentCount: number;
 }
 
 export class UpdateGroupDto {
