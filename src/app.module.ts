@@ -15,6 +15,7 @@ import {Timetable} from "./timetable/timetable.model";
 import {Teacher} from "./teachers/teachers.model";
 import {Subject} from "./subject/subject.model";
 import {Classroom} from "./classroom/сlassroom.model";
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import {Classroom} from "./classroom/сlassroom.model";
     ClassroomModule,
     GroupsModule,
     SubjectModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

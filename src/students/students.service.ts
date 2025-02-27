@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Student } from './students.model';
-import { CreateStudentDto, UpdateStudentDto } from './dto/create-student.dto';
+import {Injectable, NotFoundException, UseGuards} from '@nestjs/common';
+import {InjectModel} from '@nestjs/sequelize';
+import {Student} from './students.model';
+import {CreateStudentDto, UpdateStudentDto} from './dto/create-student.dto';
+import bcrypt from "bcrypt"
 
 @Injectable()
 export class StudentsService {
@@ -11,6 +12,7 @@ export class StudentsService {
   ) {}
 
   async create(createStudentDto: CreateStudentDto): Promise<Student> {
+    createStudentDto.password = await bcrypt.hash(createStudentDto.password, 10)
     return await this.studentModel.create(createStudentDto as Student);
   }
 
@@ -25,7 +27,13 @@ export class StudentsService {
     }
     return student;
   }
-
+  async findByUsername(username: string){
+      return await this.studentModel.findOne({
+          where: {
+              name: username
+          }
+      })
+  }
   async update(id: number, updateStudentDto: UpdateStudentDto): Promise<Student> {
     const student = await this.findOne(id);
     await student.update(updateStudentDto);

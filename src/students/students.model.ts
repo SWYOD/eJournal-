@@ -34,6 +34,10 @@ export class Student extends Model<Student> {
     type: DataType.STRING,
   })
   email: string;
+  @Column({
+    type: DataType.STRING,
+  })
+  password: string;
 
   @ForeignKey(() => Group)
   @Column({

@@ -18,6 +18,7 @@ export class CreateStudentDto {
   @ApiProperty({ example: 1, description: 'ID группы, к которой принадлежит студент' })
   @IsInt({ message: 'ID группы должно быть числом' })
   groupId: number;
+  password: string
 }
 
 export class UpdateStudentDto {
