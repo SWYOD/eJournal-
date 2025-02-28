@@ -2,7 +2,8 @@ import {Injectable, NotFoundException, UseGuards} from '@nestjs/common';
 import {InjectModel} from '@nestjs/sequelize';
 import {Student} from './students.model';
 import {CreateStudentDto, UpdateStudentDto} from './dto/create-student.dto';
-import bcrypt from "bcrypt"
+import * as bcrypt from 'bcrypt';
+
 
 @Injectable()
 export class StudentsService {
@@ -27,10 +28,10 @@ export class StudentsService {
     }
     return student;
   }
-  async findByUsername(username: string){
+  async findByUsername(email: string){
       return await this.studentModel.findOne({
           where: {
-              name: username
+              email
           }
       })
   }
