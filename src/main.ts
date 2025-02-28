@@ -9,6 +9,7 @@ async function bootstrap() {
       .setVersion('1.0')
       .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
+  app.enableCors();
   SwaggerModule.setup('api', app, documentFactory);
   await app.listen(process.env.PORT ?? 3000);
 }
