@@ -12,7 +12,7 @@ export class TimetableController {
 
   @ApiOperation({ summary: 'Создание записи расписания' })
   @ApiResponse({ status: 201, description: 'Запись успешно создана', type: Timetable })
-  @UseGuards(AuthGuard('student'))
+  // @UseGuards(AuthGuard('student'))
   @Post()
   async create(@Body() createTimetableDto: CreateTimetableDto): Promise<Timetable> {
     return this.timetableService.create(createTimetableDto);
@@ -20,7 +20,7 @@ export class TimetableController {
 
   @ApiOperation({ summary: 'Получение всех записей расписания' })
   @ApiResponse({ status: 200, description: 'Список записей расписания', type: [Timetable] })
-  @UseGuards(AuthGuard('student'))
+  // @UseGuards(AuthGuard('student'))
   @Get()
   async findAll(): Promise<Timetable[]> {
     return this.timetableService.findAll();
@@ -29,7 +29,7 @@ export class TimetableController {
   @ApiOperation({ summary: 'Получение записи расписания по ID' })
   @ApiResponse({ status: 200, description: 'Запись расписания найдена', type: Timetable })
   @ApiResponse({ status: 404, description: 'Запись расписания не найдена' })
-  @UseGuards(AuthGuard('student'))
+  // @UseGuards(AuthGuard('student'))
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<Timetable> {
     return this.timetableService.findOne(id);
@@ -38,7 +38,7 @@ export class TimetableController {
   @ApiOperation({ summary: 'Обновление записи расписания' })
   @ApiResponse({ status: 200, description: 'Запись расписания обновлена', type: Timetable })
   @ApiResponse({ status: 404, description: 'Запись расписания не найдена' })
-  @UseGuards(AuthGuard('student'))
+  // @UseGuards(AuthGuard('student'))
   @Patch(':id')
   async update(@Param('id') id: number, @Body() updateTimetableDto: UpdateTimetableDto): Promise<Timetable> {
     return this.timetableService.update(id, updateTimetableDto);
@@ -47,7 +47,7 @@ export class TimetableController {
   @ApiOperation({ summary: 'Удаление записи расписания' })
   @ApiResponse({ status: 200, description: 'Запись расписания удалена' })
   @ApiResponse({ status: 404, description: 'Запись расписания не найдена' })
-  @UseGuards(AuthGuard('student'))
+  // @UseGuards(AuthGuard('student'))
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     return this.timetableService.remove(id);
