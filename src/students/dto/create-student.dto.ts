@@ -5,7 +5,7 @@ import {PartialType} from "@nestjs/mapped-types";
 export class CreateStudentDto {
   @ApiProperty({ example: 'staskoroboff', description: 'Никнейм студента' })
   @IsString({ message: 'Имя должно быть строкой' })
-  @IsNotEmpty({ message: 'Имя не должно быть пустым' })
+  // @IsNotEmpty({ message: 'Имя не должно быть пустым' })
   name: string;
 
   @ApiProperty({ example: 'Станислав', description: 'Имя студента' })
@@ -23,11 +23,12 @@ export class CreateStudentDto {
   bDate: Date;
 
   @ApiProperty({ example: 'john.doe@example.com', description: 'Email студента' })
+  @IsNotEmpty({ message: 'Email не должно быть пустым' })
   @IsEmail()
   email: string;
 
   @ApiProperty({ example: 1, description: 'ID группы, к которой принадлежит студент' })
-  @IsInt({ message: 'ID группы должно быть числом' })
+  // @IsInt({ message: 'ID группы должно быть числом' })
   groupId: number;
 
   @ApiProperty({ example: '1a3d5g7j9l', description: 'Пароль студента' })

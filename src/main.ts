@@ -11,13 +11,13 @@ async function bootstrap() {
       .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   app.enableCors();
-  app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      })
-  );
+  // app.useGlobalPipes(
+  //     new ValidationPipe({
+  //       whitelist: true,
+  //       forbidNonWhitelisted: true,
+  //       transform: true,
+  //     })
+  // );
   SwaggerModule.setup('api', app, documentFactory);
   await app.listen(process.env.PORT ?? 3000);
 }
