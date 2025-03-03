@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Timetable } from './timetable.model';
-import { CreateTimetableDto, UpdateTimetableDto } from './dto/timetable.dto';
+import {CreateTimetableDto, GetWeeklyTimetableDto, UpdateTimetableDto} from './dto/timetable.dto';
+import { addDays, startOfWeek, endOfWeek } from 'date-fns';
+import {Op} from "sequelize";
 
 @Injectable()
 export class TimetableService {
@@ -29,7 +31,24 @@ export class TimetableService {
     }
     return timetable;
   }
+  async findWeekly(getWeeklyDto: GetWeeklyTimetableDto): Promise<Timetable[]> {
+    const { groupId, weekStart } = getWeeklyDto;
 
+    // Рассчитываем границы недели
+    const startDate = startOfWeek(new Date(weekStart), { weekStartsOn: 1 }); // Неделя начинается с понедельника
+    const endDate = endOfWeek(new Date(weekStart), { weekStartsOn: 1 });
+
+    return this.timetableModel.findAll({
+      where: {
+        groupId,
+        subjDate: {
+          [Op.between]: [startDate, endDate]
+        }
+      },
+      include: { all: true },
+      order: [['subjDate', 'ASC']]
+    });
+  }
   async update(id: number, updateTimetableDto: UpdateTimetableDto): Promise<Timetable> {
     const timetable = await this.findOne(id);
     await timetable.update(updateTimetableDto);

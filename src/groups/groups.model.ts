@@ -18,7 +18,10 @@ export class Group extends Model<Group> {
     type: DataType.STRING,
   })
   name: string;
-
+  @Column({
+    type: DataType.STRING,
+  })
+  specialization : string;
   @Column({
     type: DataType.INTEGER,
   })

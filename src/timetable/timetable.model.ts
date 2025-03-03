@@ -20,7 +20,14 @@ export class Timetable extends Model<Timetable> {
     type: DataType.DATE,
   })
   subjDate: Date;
-
+  @Column({
+    type: DataType.STRING,
+  })
+  description: string;
+  @Column({
+    type: DataType.STRING,
+  })
+  homework: string;
   // Внешние ключи
   @ForeignKey(() => Teacher)
   @Column({

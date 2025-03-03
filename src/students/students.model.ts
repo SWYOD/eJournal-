@@ -24,6 +24,14 @@ export class Student extends Model<Student> {
     type: DataType.STRING,
   })
   name: string;
+  @Column({
+    type: DataType.STRING,
+  })
+  first_name: string;
+  @Column({
+    type: DataType.STRING,
+  })
+  second_name: string;
 
   @Column({
     type: DataType.DATE,

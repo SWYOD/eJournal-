@@ -27,7 +27,10 @@ export class CreateTimetableDto {
     @IsInt({ message: 'ID предмета должно быть числом' })
     subjectId: number;
 }
-
+export class GetWeeklyTimetableDto {
+    groupId: number;
+    weekStart: Date; // Дата начала недели в формате ISO (YYYY-MM-DD)
+}
 export class UpdateTimetableDto extends PartialType(CreateTimetableDto){
 
 }

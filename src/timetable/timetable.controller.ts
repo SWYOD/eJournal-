@@ -1,7 +1,7 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TimetableService } from './timetable.service';
-import { CreateTimetableDto, UpdateTimetableDto } from './dto/timetable.dto';
+import {CreateTimetableDto, GetWeeklyTimetableDto, UpdateTimetableDto} from './dto/timetable.dto';
 import { Timetable } from './timetable.model';
 import {AuthGuard} from "@nestjs/passport";
 
@@ -51,5 +51,9 @@ export class TimetableController {
   @Delete(':id')
   async remove(@Param('id') id: number): Promise<void> {
     return this.timetableService.remove(id);
+  }
+  @Get('weekly')
+  async getWeekly(@Query() getWeeklyDto: GetWeeklyTimetableDto) {
+    return this.timetableService.findWeekly(getWeeklyDto);
   }
 }
