@@ -16,6 +16,7 @@ import {Teacher} from "./teachers/teachers.model";
 import {Subject} from "./subject/subject.model";
 import {Classroom} from "./classroom/сlassroom.model";
 import { AuthModule } from './auth/auth.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AuthModule } from './auth/auth.module';
     GroupsModule,
     SubjectModule,
     AuthModule,
+    S3Module,
   ],
   controllers: [AppController],
   providers: [AppService],

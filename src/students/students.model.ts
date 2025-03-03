@@ -33,7 +33,14 @@ export class Student extends Model<Student> {
     type: DataType.STRING,
   })
   second_name: string;
-
+  @Column({
+    type: DataType.STRING,
+  })
+  avatar: string;
+  @Column({
+    type: DataType.STRING,
+  })
+  cover: string;
   @Column({
     type: DataType.DATE,
   })
