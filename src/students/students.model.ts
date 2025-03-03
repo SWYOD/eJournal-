@@ -22,6 +22,7 @@ export class Student extends Model<Student> {
 
   @Column({
     type: DataType.STRING,
+    unique: true,
   })
   name: string;
   @Column({
@@ -40,6 +41,7 @@ export class Student extends Model<Student> {
 
   @Column({
     type: DataType.STRING,
+    unique: true,
   })
   email: string;
   @Column({

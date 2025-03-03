@@ -1,8 +1,9 @@
-import {Injectable, NotFoundException, UseGuards} from '@nestjs/common';
+import {ConflictException, Injectable, NotFoundException, UseGuards} from '@nestjs/common';
 import {InjectModel} from '@nestjs/sequelize';
 import {Student} from './students.model';
 import {CreateStudentDto, UpdateStudentDto} from './dto/create-student.dto';
 import * as bcrypt from 'bcrypt';
+import {UniqueConstraintError} from "sequelize";
 
 
 @Injectable()
@@ -13,8 +14,15 @@ export class StudentsService {
   ) {}
 
   async create(createStudentDto: CreateStudentDto): Promise<Student> {
-    createStudentDto.password = await bcrypt.hash(createStudentDto.password, 10)
-    return await this.studentModel.create(createStudentDto as Student);
+    try {
+      createStudentDto.password = await bcrypt.hash(createStudentDto.password, 10);
+      return await this.studentModel.create(createStudentDto as Student);
+    } catch (error) {
+      if (error instanceof UniqueConstraintError) {
+        this.handleUniqueConstraintError(error);
+      }
+      throw error;
+    }
   }
 
   async findAll(): Promise<Student[]> {
@@ -44,5 +52,8 @@ export class StudentsService {
   async remove(id: number): Promise<void> {
     const student = await this.findOne(id);
     await student.destroy();
+  }
+  private handleUniqueConstraintError(error: UniqueConstraintError) {
+    throw new ConflictException(error.message);
   }
 }
