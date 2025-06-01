@@ -26,3 +26,14 @@ export class UpdateSubjectDto {
     @IsNotEmpty({ message: 'Тип не должен быть пустым' })
     type?: string;
 }
+export class CreateMarkDto {
+    @ApiProperty({ example: 'Оценка', description: 'Оценка за предмет' })
+    value: number;
+    subjectId: number;
+    @ApiProperty({ example: 'ID студента', description: 'Идентификатор студента' })
+    studentId: number;
+}
+
+export class UpdateMarkDto {
+    value?: number;
+}

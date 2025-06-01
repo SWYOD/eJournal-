@@ -1,7 +1,7 @@
 import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards} from '@nestjs/common';
 import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { SubjectService } from './subject.service';
-import { CreateSubjectDto, UpdateSubjectDto } from './dto/subject.dto';
+import {CreateMarkDto, CreateSubjectDto, UpdateMarkDto, UpdateSubjectDto} from './dto/subject.dto';
 
 @ApiTags('Subjects')
 @Controller('subjects')
@@ -12,6 +12,48 @@ export class SubjectController {
   @ApiOperation({ summary: 'Создание предмета' })
   @ApiResponse({ status: 201, description: 'Предмет успешно создан'})
   // @UseGuards(AuthGuard('student'))
+
+  @Post(':subjectId/marks')
+  addMark(
+      @Param('subjectId') subjectId: number,
+      @Body() createMarkDto: CreateMarkDto
+  ) {
+    createMarkDto.subjectId = Number(subjectId);
+    return this.subjectService.addMark(createMarkDto);
+  }
+
+  // Получение всех оценок по предмету
+  @Get(':subjectId/marks')
+  getSubjectMarks(@Param('subjectId') subjectId: number) {
+    return this.subjectService.getSubjectMarks(Number(subjectId));
+  }
+  // Обновление оценки
+  @Patch('marks/:markId')
+  updateMark(
+      @Param('markId') markId: number,
+      @Body() updateMarkDto: UpdateMarkDto
+  ) {
+    return this.subjectService.updateMark(Number(markId), updateMarkDto);
+  }
+
+  // Удаление оценки
+  @Delete('marks/:markId')
+  removeMark(@Param('markId') markId: number) {
+    return this.subjectService.removeMark(Number(markId));
+  }
+
+  // Получение оценок студента по предмету
+  @Get(':subjectId/students/:studentId/marks')
+  getStudentMarks(
+      @Param('subjectId') subjectId: number,
+      @Param('studentId') studentId: number
+  ) {
+    return this.subjectService.getStudentMarksForSubject(
+        Number(studentId),
+        Number(subjectId)
+    );
+  }
+
   @Post()
   async create(@Body() createSubjectDto: CreateSubjectDto) {
     return this.subjectService.create(createSubjectDto);
@@ -51,4 +93,6 @@ export class SubjectController {
   async remove(@Param('id') id: number) {
     return this.subjectService.remove(id);
   }
+  // Добавление оценки
+
 }

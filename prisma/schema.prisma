@@ -43,6 +43,18 @@ model Student {
   password    String
   groupId     Int
   group       Group    @relation(fields: [groupId], references: [id])
+  marks       Mark[]
+}
+
+model Mark {
+  id        Int       @id @default(autoincrement())
+  value     Int
+  subjectId Int
+  studentId Int
+  subject   Subject   @relation(fields: [subjectId], references: [id])
+  student   Student   @relation(fields: [studentId], references: [id])
+  updatedAt DateTime?
+  createdAt DateTime  @default(now())
 }
 
 model Subject {
@@ -50,6 +62,7 @@ model Subject {
   name       String
   type       String
   timetables Timetable[]
+  marks      Mark[]
 }
 
 model Teacher {
