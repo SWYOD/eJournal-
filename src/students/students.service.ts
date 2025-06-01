@@ -133,4 +133,44 @@ export class StudentsService {
       where: { id }
     });
   }
+  async getAllStudentMarks(studentId: number, subjectId?: number) {
+    // Проверяем существование студента
+    const student = await this.prisma.student.findUnique({
+      where: { id: studentId }
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Студент с ID ${studentId} не найден`);
+    }
+
+    // Формируем условия фильтрации
+    const where: any = {
+      studentId: studentId
+    };
+
+    // Добавляем фильтр по предмету если передан
+    if (subjectId !== undefined) {
+      where.subjectId = subjectId;
+
+      // Проверяем существование предмета
+      const subject = await this.prisma.subject.findUnique({
+        where: { id: subjectId }
+      });
+
+      if (!subject) {
+        throw new NotFoundException(`Предмет с ID ${subjectId} не найден`);
+      }
+    }
+
+    // Получаем оценки с информацией о предметах
+    return this.prisma.mark.findMany({
+      where,
+      include: {
+        subject: true
+      },
+      orderBy: {
+        createdAt: 'desc' // Сортировка по дате оценки (новые сначала)
+      }
+    });
+  }
 }

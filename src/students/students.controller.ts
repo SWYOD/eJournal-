@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   UploadedFile,
-  UseInterceptors
+  UseInterceptors, Query
 } from '@nestjs/common';
 import {ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { StudentsService } from './students.service';
@@ -25,6 +25,16 @@ export class StudentsController {
   @Post()
   async create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentService.create(createStudentDto);
+  }
+  @Get(':id/marks')
+  getStudentMarks(
+      @Param('id') id: string,
+      @Query('subjectId') subjectId?: string
+  ) {
+    return this.studentService.getAllStudentMarks(
+        Number(id),
+        subjectId ? Number(subjectId) : undefined
+    );
   }
   @Post(':id/avatar')
   @UseInterceptors(FileInterceptor('file'))
