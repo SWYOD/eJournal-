@@ -1,10 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {IsDateString, IsInt} from 'class-validator';
-import {Column, DataType, ForeignKey} from "sequelize-typescript";
-import {Teacher} from "../../teachers/teachers.model";
-import {Classroom} from "../../classroom/сlassroom.model";
-import {Group} from "../../groups/groups.model";
-import {Subject} from "../../subject/subject.model";
 import {PartialType} from "@nestjs/mapped-types";
 
 export class CreateTimetableDto {

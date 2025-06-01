@@ -62,8 +62,8 @@ model Teacher {
 model Timetable {
   id          Int      @id @default(autoincrement())
   subjDate    DateTime
-  description String
-  homework    String
+  description String?
+  homework    String?
 
   // Foreign keys
   teacherId   Int
