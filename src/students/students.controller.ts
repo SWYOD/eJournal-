@@ -6,17 +6,17 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common';
-import {ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { StudentsService } from './students.service';
 import { CreateStudentDto, UpdateStudentDto } from './dto/create-student.dto';
 import {FileInterceptor} from "@nestjs/platform-express";
 
 @ApiTags('Students')
 @Controller('students')
+@ApiBearerAuth()
 export class StudentsController {
   constructor(private readonly studentService: StudentsService) {}
 

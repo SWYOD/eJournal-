@@ -1,10 +1,11 @@
 import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards} from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { SubjectService } from './subject.service';
 import { CreateSubjectDto, UpdateSubjectDto } from './dto/subject.dto';
 
 @ApiTags('Subjects')
 @Controller('subjects')
+@ApiBearerAuth()
 export class SubjectController {
   constructor(private readonly subjectService: SubjectService) {}
 

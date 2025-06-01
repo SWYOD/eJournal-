@@ -23,17 +23,74 @@ export class TimetableService {
     });
   }
 
-  async findAll() {
-    return this.prisma.timetable.findMany({
-      include: {
-        teacher: true,
-        classroom: true,
-        group: true,
-        subject: true
-      }
-    });
-  }
+  async findAll({
+                  page = 1,
+                  limit = 10,
+                  teacherId,
+                  classroomId,
+                  groupId,
+                  subjectId,
+                  sortBy = 'subjDate',
+                  sortOrder = 'asc'
+                }: {
+    page?: number;
+    limit?: number;
+    teacherId?: number;
+    classroomId?: number;
+    groupId?: number;
+    subjectId?: number;
+    sortBy?: 'subjDate' | 'endDate';
+    sortOrder?: 'asc' | 'desc';
+  }) {
+    const now = new Date();
 
+    const where = {};
+    if (teacherId) where['teacherId'] = teacherId;
+    if (classroomId) where['classroomId'] = classroomId;
+    if (groupId) where['groupId'] = groupId;
+    if (subjectId) where['subjectId'] = subjectId;
+
+    const [total, timetables] = await Promise.all([
+      this.prisma.timetable.count({ where }),
+      this.prisma.timetable.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        where,
+        orderBy: { [sortBy]: sortOrder },
+        include: {
+          teacher: true,
+          classroom: true,
+          group: true,
+          subject: true
+        }
+      })
+    ]);
+
+    // Добавляем статус к каждому элементу расписания
+    const data = timetables.map(timetable => {
+      let status: 'current' | 'previous' | 'next';
+
+      if (now >= timetable.subjDate && now <= timetable.endDate) {
+        status = 'current';
+      } else if (now > timetable.endDate) {
+        status = 'previous';
+      } else {
+        status = 'next';
+      }
+
+      return {
+        ...timetable,
+        status
+      };
+    });
+
+    return {
+      data,
+      total,
+      page,
+      last_page: Math.ceil(total / limit),
+    };
+  }
   async findOne(id: number) {
     const timetable = await this.prisma.timetable.findUnique({
       where: { id },

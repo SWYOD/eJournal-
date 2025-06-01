@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { ClassroomService } from './classroom.service';
 import { CreateClassroomDto, UpdateClassroomDto } from './dto/classroom.dto';
 
 @ApiTags('Classrooms')
+@ApiBearerAuth()
 @Controller('classrooms')
 export class ClassroomController {
   constructor(private readonly classroomService: ClassroomService) {}

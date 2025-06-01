@@ -62,6 +62,7 @@ model Teacher {
 model Timetable {
   id          Int      @id @default(autoincrement())
   subjDate    DateTime
+  endDate     DateTime
   description String?
   homework    String?
 

@@ -9,6 +9,12 @@ export class CreateTimetableDto {
     })
     @IsDateString()
     subjDate: Date;
+    @ApiProperty({
+        example: '2025-02-09T00:00:00Z',
+        description: 'Дата окончания занятия (в формате ISO)',
+    })
+    @IsDateString()
+    endDate: Date;
     @ApiProperty({ example: 1, description: 'ID учителя' })
     @IsInt({ message: 'ID учителя должно быть числом' })
     teacherId: number;

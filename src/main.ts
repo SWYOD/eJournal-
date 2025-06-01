@@ -8,8 +8,10 @@ async function bootstrap() {
   const config = new DocumentBuilder()
       .setTitle('API Электронного журнала')
       .setVersion('1.0')
+      .addBearerAuth()
       .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
+
   app.enableCors();
   // app.useGlobalPipes(
   //     new ValidationPipe({
