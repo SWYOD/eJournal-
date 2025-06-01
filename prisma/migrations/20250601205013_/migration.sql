@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Student" ALTER COLUMN "avatar" DROP NOT NULL,
+ALTER COLUMN "cover" DROP NOT NULL;

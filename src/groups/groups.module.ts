@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { GroupsController } from './groups.controller';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Group } from './groups.model';
+import {PrismaModule} from "../prisma/prisma.module";
+
 
 @Module({
   controllers: [GroupsController],
   providers: [GroupsService],
-  imports: [SequelizeModule.forFeature([Group])],
+  imports: [PrismaModule],
 })
 export class GroupsModule {}

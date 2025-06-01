@@ -1,39 +1,48 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Teacher } from './teachers.model';
 import { CreateTeacherDto, UpdateTeacherDto } from './dto/teacher.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TeachersService {
-  constructor(
-      @InjectModel(Teacher)
-      private readonly teacherModel: typeof Teacher,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(createTeacherDto: CreateTeacherDto): Promise<Teacher> {
-    return await this.teacherModel.create(createTeacherDto as Teacher);
+  async create(createTeacherDto: CreateTeacherDto) {
+    return this.prisma.teacher.create({
+      data: createTeacherDto
+    });
   }
 
-  async findAll(): Promise<Teacher[]> {
-    return await this.teacherModel.findAll();
+  async findAll() {
+    return this.prisma.teacher.findMany();
   }
 
-  async findOne(id: number): Promise<Teacher> {
-    const teacher = await this.teacherModel.findByPk(id);
+  async findOne(id: number) {
+    const teacher = await this.prisma.teacher.findUnique({
+      where: { id }
+    });
+
     if (!teacher) {
       throw new NotFoundException(`Учитель с ID ${id} не найден`);
     }
     return teacher;
   }
 
-  async update(id: number, updateTeacherDto: UpdateTeacherDto): Promise<Teacher> {
-    const teacher = await this.findOne(id);
-    await teacher.update(updateTeacherDto);
-    return teacher;
+  async update(id: number, updateTeacherDto: UpdateTeacherDto) {
+    // Проверяем существование учителя
+    await this.findOne(id);
+
+    return this.prisma.teacher.update({
+      where: { id },
+      data: updateTeacherDto
+    });
   }
 
-  async remove(id: number): Promise<void> {
-    const teacher = await this.findOne(id);
-    await teacher.destroy();
+  async remove(id: number) {
+    // Проверяем существование учителя
+    await this.findOne(id);
+
+    return this.prisma.teacher.delete({
+      where: { id }
+    });
   }
 }

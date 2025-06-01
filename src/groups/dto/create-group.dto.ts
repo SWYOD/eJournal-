@@ -11,6 +11,10 @@ export class CreateGroupDto {
     @IsInt({ message: 'Количество студентов должно быть целым числом' })
     @Min(1, { message: 'Минимальное количество студентов - 1' })
     studentCount: number;
+
+    @ApiProperty({ example: 25, description: 'Специализация' })
+    @IsString({ message: 'Название должно быть строкой' })
+    specialization: string;
 }
 
 export class UpdateGroupDto {

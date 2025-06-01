@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model Classroom {
+  id        Int         @id @default(autoincrement())
+  number    Int
+  capacity  Int
+  timetable Timetable[]
+}
+
+model Group {
+  id             Int         @id @default(autoincrement())
+  name           String
+  specialization String
+  studentCount   Int
+  students       Student[]
+  timetables     Timetable[]
+}
+
+model Student {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  first_name  String
+  second_name String
+  avatar      String?
+  cover       String?
+  bDate       DateTime
+  email       String   @unique
+  password    String
+  groupId     Int
+  group       Group    @relation(fields: [groupId], references: [id])
+}
+
+model Subject {
+  id         Int         @id @default(autoincrement())
+  name       String
+  type       String
+  timetables Timetable[]
+}
+
+model Teacher {
+  id         Int         @id @default(autoincrement())
+  name       String
+  subjects   String
+  timetables Timetable[]
+}
+
+model Timetable {
+  id          Int      @id @default(autoincrement())
+  subjDate    DateTime
+  description String
+  homework    String
+
+  // Foreign keys
+  teacherId   Int
+  classroomId Int
+  groupId     Int
+  subjectId   Int
+
+  // Relations
+  teacher   Teacher   @relation(fields: [teacherId], references: [id])
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+  group     Group     @relation(fields: [groupId], references: [id])
+  subject   Subject   @relation(fields: [subjectId], references: [id])
+}

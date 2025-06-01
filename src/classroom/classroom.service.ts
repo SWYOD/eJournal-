@@ -1,39 +1,48 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import { Classroom } from './сlassroom.model';
 import { CreateClassroomDto, UpdateClassroomDto } from './dto/classroom.dto';
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class ClassroomService {
-  constructor(
-      @InjectModel(Classroom)
-      private readonly classroomModel: typeof Classroom,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async create(createClassroomDto: CreateClassroomDto): Promise<Classroom> {
-    return await this.classroomModel.create(createClassroomDto as Classroom);
+  async create(createClassroomDto: CreateClassroomDto) {
+    return this.prisma.classroom.create({
+      data: createClassroomDto
+    });
   }
 
-  async findAll(): Promise<Classroom[]> {
-    return await this.classroomModel.findAll();
+  async findAll() {
+    return this.prisma.classroom.findMany();
   }
 
-  async findOne(id: number): Promise<Classroom> {
-    const classroom = await this.classroomModel.findByPk(id);
+  async findOne(id: number) {
+    const classroom = await this.prisma.classroom.findUnique({
+      where: { id }
+    });
+
     if (!classroom) {
       throw new NotFoundException(`Аудитория с ID ${id} не найдена`);
     }
     return classroom;
   }
 
-  async update(id: number, updateClassroomDto: UpdateClassroomDto): Promise<Classroom> {
-    const classroom = await this.findOne(id);
-    await classroom.update(updateClassroomDto);
-    return classroom;
+  async update(id: number, updateClassroomDto: UpdateClassroomDto) {
+    // Проверяем существование записи
+    await this.findOne(id);
+
+    return this.prisma.classroom.update({
+      where: { id },
+      data: updateClassroomDto
+    });
   }
 
-  async remove(id: number): Promise<void> {
-    const classroom = await this.findOne(id);
-    await classroom.destroy();
+  async remove(id: number) {
+    // Проверяем существование записи
+    await this.findOne(id);
+
+    return this.prisma.classroom.delete({
+      where: { id }
+    });
   }
 }

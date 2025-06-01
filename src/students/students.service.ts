@@ -1,32 +1,46 @@
-import {BadRequestException, ConflictException, Injectable, NotFoundException, UseGuards} from '@nestjs/common';
-import {InjectModel} from '@nestjs/sequelize';
-import {Student} from './students.model';
-import {CreateStudentDto, UpdateStudentDto} from './dto/create-student.dto';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common';
+import { CreateStudentDto, UpdateStudentDto } from './dto/create-student.dto';
 import * as bcrypt from 'bcrypt';
-import {UniqueConstraintError} from "sequelize";
-import {S3Service} from "../s3/s3.service";
-
+import { PrismaService } from '../prisma/prisma.service';
+import { S3Service } from "../s3/s3.service";
+import { Prisma } from '../../generated/prisma';
 
 @Injectable()
 export class StudentsService {
   constructor(
-      @InjectModel(Student)
-      private readonly studentModel: typeof Student,
+      private readonly prisma: PrismaService,
       private readonly s3Service: S3Service
   ) {}
 
-  async create(createStudentDto: CreateStudentDto): Promise<Student> {
+  async create(createStudentDto: CreateStudentDto) {
     try {
-      createStudentDto.password = await bcrypt.hash(createStudentDto.password, 10);
-      return await this.studentModel.create(createStudentDto as Student);
+      const hashedPassword = await bcrypt.hash(createStudentDto.password, 10);
+
+      return await this.prisma.student.create({
+        data: {
+          ...createStudentDto,
+          password: hashedPassword,
+        }
+      });
     } catch (error) {
-      if (error instanceof UniqueConstraintError) {
-        this.handleUniqueConstraintError(error);
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          const field = error.meta?.target?.[0];
+          throw new ConflictException(
+              `Студент с таким ${field} уже существует`
+          );
+        }
       }
       throw error;
     }
   }
-  async uploadAvatar(id: number, file: Express.Multer.File): Promise<Student> {
+
+  async uploadAvatar(id: number, file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('Файл не был загружен');
     }
@@ -46,10 +60,13 @@ export class StudentsService {
     );
 
     // Обновляем запись студента
-    return student.update({ avatar: uploadResult.key });
+    return this.prisma.student.update({
+      where: { id },
+      data: { avatar: uploadResult.key }
+    });
   }
 
-  async uploadCover(id: number, file: Express.Multer.File): Promise<Student> {
+  async uploadCover(id: number, file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('Файл не был загружен');
     }
@@ -66,38 +83,54 @@ export class StudentsService {
         file.mimetype
     );
 
-    return student.update({ cover: uploadResult.key });
+    return this.prisma.student.update({
+      where: { id },
+      data: { cover: uploadResult.key }
+    });
   }
 
-  async findAll(): Promise<Student[]> {
-    return await this.studentModel.findAll({ include: { all: true } });
+  async findAll() {
+    return this.prisma.student.findMany({
+      include: {
+        group: true
+      }
+    });
   }
 
-  async findOne(id: number): Promise<Student> {
-    const student = await this.studentModel.findByPk(id, { include: { all: true } });
+  async findOne(id: number) {
+    const student = await this.prisma.student.findUnique({
+      where: { id },
+      include: { group: true }
+    });
+
     if (!student) {
       throw new NotFoundException(`Студент с ID ${id} не найден`);
     }
     return student;
   }
-  async findByUsername(email: string){
-      return await this.studentModel.findOne({
-          where: {
-              email
-          }
-      })
-  }
-  async update(id: number, updateStudentDto: UpdateStudentDto): Promise<Student> {
-    const student = await this.findOne(id);
-    await student.update(updateStudentDto);
-    return student;
+
+  async findByUsername(email: string) {
+    return this.prisma.student.findUnique({
+      where: { email }
+    });
   }
 
-  async remove(id: number): Promise<void> {
-    const student = await this.findOne(id);
-    await student.destroy();
+  async update(id: number, updateStudentDto: UpdateStudentDto) {
+    // Проверяем существование студента
+    await this.findOne(id);
+
+    return this.prisma.student.update({
+      where: { id },
+      data: updateStudentDto
+    });
   }
-  private handleUniqueConstraintError(error: UniqueConstraintError) {
-    throw new ConflictException(error.message);
+
+  async remove(id: number) {
+    // Проверяем существование студента
+    await this.findOne(id);
+
+    return this.prisma.student.delete({
+      where: { id }
+    });
   }
 }

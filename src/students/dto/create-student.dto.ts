@@ -28,7 +28,6 @@ export class CreateStudentDto {
   email: string;
 
   @ApiProperty({ example: 1, description: 'ID группы, к которой принадлежит студент' })
-  // @IsInt({ message: 'ID группы должно быть числом' })
   groupId: number;
 
   @ApiProperty({ example: '1a3d5g7j9l', description: 'Пароль студента' })

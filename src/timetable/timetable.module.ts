@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TimetableService } from './timetable.service';
 import { TimetableController } from './timetable.controller';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Timetable } from './timetable.model';
+import {PrismaModule} from "../prisma/prisma.module";
 
 @Module({
   controllers: [TimetableController],
   providers: [TimetableService],
-  imports: [SequelizeModule.forFeature([Timetable])],
+  imports: [PrismaModule],
 })
 export class TimetableModule {}

@@ -13,8 +13,6 @@ import {
 import {ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags} from '@nestjs/swagger';
 import { StudentsService } from './students.service';
 import { CreateStudentDto, UpdateStudentDto } from './dto/create-student.dto';
-import { Student } from './students.model';
-import {AuthGuard} from "@nestjs/passport";
 import {FileInterceptor} from "@nestjs/platform-express";
 
 @ApiTags('Students')
@@ -23,9 +21,9 @@ export class StudentsController {
   constructor(private readonly studentService: StudentsService) {}
 
   @ApiOperation({ summary: 'Создание студента' })
-  @ApiResponse({ status: 201, description: 'Студент успешно создан', type: Student })
+  @ApiResponse({ status: 201, description: 'Студент успешно создан' })
   @Post()
-  async create(@Body() createStudentDto: CreateStudentDto): Promise<Student> {
+  async create(@Body() createStudentDto: CreateStudentDto) {
     return this.studentService.create(createStudentDto);
   }
   @Post(':id/avatar')
@@ -48,7 +46,6 @@ export class StudentsController {
   @ApiResponse({
     status: 200,
     description: 'Аватар успешно загружен',
-    type: Student,
   })
   @ApiResponse({ status: 400, description: 'Некорректный файл' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
@@ -79,7 +76,6 @@ export class StudentsController {
   @ApiResponse({
     status: 200,
     description: 'Обложка успешно загружена',
-    type: Student,
   })
   @ApiResponse({ status: 400, description: 'Некорректный файл' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
@@ -90,28 +86,28 @@ export class StudentsController {
     return this.studentService.uploadCover(id, file);
   }
   @ApiOperation({ summary: 'Получение всех студентов' })
-  @ApiResponse({ status: 200, description: 'Возвращает список студентов', type: [Student] })
+  @ApiResponse({ status: 200, description: 'Возвращает список студентов' })
   // @UseGuards(AuthGuard('student'))
   @Get()
-  async findAll(): Promise<Student[]> {
+  async findAll() {
     return this.studentService.findAll();
   }
 
   @ApiOperation({ summary: 'Получение студента по ID' })
-  @ApiResponse({ status: 200, description: 'Студент найден', type: Student })
+  @ApiResponse({ status: 200, description: 'Студент найден' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   // @UseGuards(AuthGuard('student'))
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<Student> {
+  async findOne(@Param('id') id: number) {
     return this.studentService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Обновление студента' })
-  @ApiResponse({ status: 200, description: 'Студент обновлён', type: Student })
+  @ApiResponse({ status: 200, description: 'Студент обновлён' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   // @UseGuards(AuthGuard('student'))
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateStudentDto: UpdateStudentDto): Promise<Student> {
+  async update(@Param('id') id: number, @Body() updateStudentDto: UpdateStudentDto) {
     return this.studentService.update(id, updateStudentDto);
   }
 
@@ -120,7 +116,7 @@ export class StudentsController {
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   // @UseGuards(AuthGuard('student'))
   @Delete(':id')
-  async remove(@Param('id') id: number): Promise<void> {
+  async remove(@Param('id') id: number) {
     return this.studentService.remove(id);
   }
 }

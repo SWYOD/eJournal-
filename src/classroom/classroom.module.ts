@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ClassroomService } from './classroom.service';
 import { ClassroomController } from './classroom.controller';
-import { SequelizeModule } from '@nestjs/sequelize';
-import { Classroom } from './сlassroom.model';
+import {PrismaModule} from "../prisma/prisma.module";
 
 @Module({
   controllers: [ClassroomController],
   providers: [ClassroomService],
-  imports: [SequelizeModule.forFeature([Classroom])],
+  imports: [PrismaModule],
 })
 export class ClassroomModule {}
