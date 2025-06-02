@@ -2,19 +2,19 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateStudentDto, UpdateStudentDto } from './dto/create-student.dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
-import { S3Service } from "../s3/s3.service";
+import { S3Service } from '../s3/s3.service';
 import { Prisma } from '../../generated/prisma';
 
 @Injectable()
 export class StudentsService {
   constructor(
-      private readonly prisma: PrismaService,
-      private readonly s3Service: S3Service
+    private readonly prisma: PrismaService,
+    private readonly s3Service: S3Service,
   ) {}
 
   async create(createStudentDto: CreateStudentDto) {
@@ -25,14 +25,14 @@ export class StudentsService {
         data: {
           ...createStudentDto,
           password: hashedPassword,
-        }
+        },
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           const field = error.meta?.target?.[0];
           throw new ConflictException(
-              `Студент с таким ${field} уже существует`
+            `Студент с таким ${field} уже существует`,
           );
         }
       }
@@ -54,15 +54,15 @@ export class StudentsService {
 
     // Загружаем новый файл
     const uploadResult = await this.s3Service.uploadFile(
-        file.originalname,
-        file.buffer,
-        file.mimetype
+      file.originalname,
+      file.buffer,
+      file.mimetype,
     );
 
     // Обновляем запись студента
     return this.prisma.student.update({
       where: { id },
-      data: { avatar: uploadResult.key }
+      data: { avatar: uploadResult.key },
     });
   }
 
@@ -78,29 +78,30 @@ export class StudentsService {
     }
 
     const uploadResult = await this.s3Service.uploadFile(
-        file.originalname,
-        file.buffer,
-        file.mimetype
+      file.originalname,
+      file.buffer,
+      file.mimetype,
     );
 
     return this.prisma.student.update({
       where: { id },
-      data: { cover: uploadResult.key }
+      data: { cover: uploadResult.key },
     });
   }
 
   async findAll() {
     return this.prisma.student.findMany({
       include: {
-        group: true
-      }
+        group: true,
+      },
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number | string) {
+    const studentId = typeof id === 'string' ? Number(id) : id;
     const student = await this.prisma.student.findUnique({
-      where: { id },
-      include: { group: true }
+      where: { id: studentId },
+      include: { group: true },
     });
 
     if (!student) {
@@ -111,7 +112,7 @@ export class StudentsService {
 
   async findByUsername(email: string) {
     return this.prisma.student.findUnique({
-      where: { email }
+      where: { email },
     });
   }
 
@@ -121,7 +122,7 @@ export class StudentsService {
 
     return this.prisma.student.update({
       where: { id },
-      data: updateStudentDto
+      data: updateStudentDto,
     });
   }
 
@@ -130,13 +131,13 @@ export class StudentsService {
     await this.findOne(id);
 
     return this.prisma.student.delete({
-      where: { id }
+      where: { id },
     });
   }
   async getAllStudentMarks(studentId: number, subjectId?: number) {
     // Проверяем существование студента
     const student = await this.prisma.student.findUnique({
-      where: { id: studentId }
+      where: { id: studentId },
     });
 
     if (!student) {
@@ -145,7 +146,7 @@ export class StudentsService {
 
     // Формируем условия фильтрации
     const where: any = {
-      studentId: studentId
+      studentId: studentId,
     };
 
     // Добавляем фильтр по предмету если передан
@@ -154,7 +155,7 @@ export class StudentsService {
 
       // Проверяем существование предмета
       const subject = await this.prisma.subject.findUnique({
-        where: { id: subjectId }
+        where: { id: subjectId },
       });
 
       if (!subject) {
@@ -166,11 +167,11 @@ export class StudentsService {
     return this.prisma.mark.findMany({
       where,
       include: {
-        subject: true
+        subject: true,
       },
       orderBy: {
-        createdAt: 'desc' // Сортировка по дате оценки (новые сначала)
-      }
+        createdAt: 'desc', // Сортировка по дате оценки (новые сначала)
+      },
     });
   }
 }

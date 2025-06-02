@@ -32,17 +32,17 @@ model Group {
 }
 
 model Student {
-  id          Int      @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   name        String   @unique
   first_name  String
   second_name String
   avatar      String?
   cover       String?
-  bDate       DateTime
+  bDate       DateTime?
   email       String   @unique
   password    String
-  groupId     Int
-  group       Group    @relation(fields: [groupId], references: [id])
+  groupId     Int?
+  group       Group?    @relation(fields: [groupId], references: [id])
   marks       Mark[]
 }
 

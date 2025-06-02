@@ -21,13 +21,12 @@ export class GroupsService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number | string) {
+    const groupId = typeof id === 'string' ? Number(id) : id;
+
     const group = await this.prisma.group.findUnique({
-      where: { id },
-      include: {
-        students: true,
-        timetables: true
-      }
+      where: { id: groupId },
+      include: { students: true, timetables: true }
     });
 
     if (!group) {
