@@ -8,7 +8,7 @@ export class TeachersService {
 
   async create(createTeacherDto: CreateTeacherDto) {
     return this.prisma.teacher.create({
-      data: createTeacherDto
+      data: createTeacherDto,
     });
   }
 
@@ -16,9 +16,10 @@ export class TeachersService {
     return this.prisma.teacher.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number | string) {
+    const teacherId = typeof id === 'string' ? Number(id) : id;
     const teacher = await this.prisma.teacher.findUnique({
-      where: { id }
+      where: { id: teacherId },
     });
 
     if (!teacher) {
@@ -33,7 +34,7 @@ export class TeachersService {
 
     return this.prisma.teacher.update({
       where: { id },
-      data: updateTeacherDto
+      data: updateTeacherDto,
     });
   }
 
@@ -42,7 +43,7 @@ export class TeachersService {
     await this.findOne(id);
 
     return this.prisma.teacher.delete({
-      where: { id }
+      where: { id },
     });
   }
 }

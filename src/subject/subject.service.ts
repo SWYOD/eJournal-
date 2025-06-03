@@ -1,6 +1,15 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
-import {CreateMarkDto, CreateSubjectDto, UpdateMarkDto, UpdateSubjectDto} from './dto/subject.dto';
-import { PrismaService } from "../prisma/prisma.service";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  CreateMarkDto,
+  CreateSubjectDto,
+  UpdateMarkDto,
+  UpdateSubjectDto,
+} from './dto/subject.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class SubjectService {
@@ -8,7 +17,7 @@ export class SubjectService {
 
   async create(createSubjectDto: CreateSubjectDto) {
     return this.prisma.subject.create({
-      data: createSubjectDto
+      data: createSubjectDto,
     });
   }
 
@@ -16,9 +25,10 @@ export class SubjectService {
     return this.prisma.subject.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number | string) {
+    const subjectId = typeof id === 'string' ? Number(id) : id;
     const subject = await this.prisma.subject.findUnique({
-      where: { id }
+      where: { id: subjectId },
     });
 
     if (!subject) {
@@ -33,7 +43,7 @@ export class SubjectService {
 
     return this.prisma.subject.update({
       where: { id },
-      data: updateSubjectDto
+      data: updateSubjectDto,
     });
   }
 
@@ -42,21 +52,29 @@ export class SubjectService {
     await this.findOne(id);
 
     return this.prisma.subject.delete({
-      where: { id }
+      where: { id },
     });
   }
   async addMark(createMarkDto: CreateMarkDto) {
     // Проверяем существование предмета и студента
     const [subject, student] = await Promise.all([
-      this.prisma.subject.findUnique({ where: { id: Number(createMarkDto.subjectId) } }),
-      this.prisma.student.findUnique({ where: { id: Number(createMarkDto.studentId) } })
+      this.prisma.subject.findUnique({
+        where: { id: Number(createMarkDto.subjectId) },
+      }),
+      this.prisma.student.findUnique({
+        where: { id: Number(createMarkDto.studentId) },
+      }),
     ]);
 
     if (!subject) {
-      throw new NotFoundException(`Предмет с ID ${createMarkDto.subjectId} не найден`);
+      throw new NotFoundException(
+        `Предмет с ID ${createMarkDto.subjectId} не найден`,
+      );
     }
     if (!student) {
-      throw new NotFoundException(`Студент с ID ${createMarkDto.studentId} не найден`);
+      throw new NotFoundException(
+        `Студент с ID ${createMarkDto.studentId} не найден`,
+      );
     }
     if (createMarkDto.value < 1 || createMarkDto.value > 5) {
       throw new BadRequestException('Оценка должна быть в диапазоне от 1 до 5');
@@ -67,7 +85,7 @@ export class SubjectService {
         value: Number(createMarkDto.value),
         subjectId: Number(createMarkDto.subjectId),
         studentId: Number(createMarkDto.studentId),
-      }
+      },
     });
   }
 
@@ -76,19 +94,22 @@ export class SubjectService {
    */
   async updateMark(markId: number, updateMarkDto: UpdateMarkDto) {
     const mark = await this.prisma.mark.findUnique({
-      where: { id: markId }
+      where: { id: markId },
     });
 
     if (!mark) {
       throw new NotFoundException(`Оценка с ID ${markId} не найдена`);
     }
-    if (updateMarkDto.value && (updateMarkDto.value < 1 || updateMarkDto.value > 5)) {
+    if (
+      updateMarkDto.value &&
+      (updateMarkDto.value < 1 || updateMarkDto.value > 5)
+    ) {
       throw new BadRequestException('Оценка должна быть в диапазоне от 1 до 5');
     }
 
     return this.prisma.mark.update({
       where: { id: markId },
-      data: updateMarkDto
+      data: updateMarkDto,
     });
   }
 
@@ -97,7 +118,7 @@ export class SubjectService {
    */
   async removeMark(markId: number) {
     const mark = await this.prisma.mark.findUnique({
-      where: { id: markId }
+      where: { id: markId },
     });
 
     if (!mark) {
@@ -105,7 +126,7 @@ export class SubjectService {
     }
 
     return this.prisma.mark.delete({
-      where: { id: markId }
+      where: { id: markId },
     });
   }
 
@@ -118,10 +139,10 @@ export class SubjectService {
       include: {
         marks: {
           include: {
-            student: true
-          }
-        }
-      }
+            student: true,
+          },
+        },
+      },
     });
 
     if (!subject) {
@@ -137,7 +158,7 @@ export class SubjectService {
   async getStudentMarksForSubject(studentId: number, subjectId: number) {
     const [student, subject] = await Promise.all([
       this.prisma.student.findUnique({ where: { id: studentId } }),
-      this.prisma.subject.findUnique({ where: { id: subjectId } })
+      this.prisma.subject.findUnique({ where: { id: subjectId } }),
     ]);
 
     if (!student) {
@@ -150,11 +171,11 @@ export class SubjectService {
     return this.prisma.mark.findMany({
       where: {
         studentId,
-        subjectId
+        subjectId,
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: 'desc',
+      },
     });
   }
 }

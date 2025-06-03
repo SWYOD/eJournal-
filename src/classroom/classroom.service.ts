@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateClassroomDto, UpdateClassroomDto } from './dto/classroom.dto';
-import { PrismaService } from "../prisma/prisma.service";
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ClassroomService {
@@ -8,7 +8,7 @@ export class ClassroomService {
 
   async create(createClassroomDto: CreateClassroomDto) {
     return this.prisma.classroom.create({
-      data: createClassroomDto
+      data: createClassroomDto,
     });
   }
 
@@ -16,9 +16,10 @@ export class ClassroomService {
     return this.prisma.classroom.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: number | string) {
+    const classroomId = typeof id === 'string' ? Number(id) : id;
     const classroom = await this.prisma.classroom.findUnique({
-      where: { id }
+      where: { id: classroomId },
     });
 
     if (!classroom) {
@@ -33,7 +34,7 @@ export class ClassroomService {
 
     return this.prisma.classroom.update({
       where: { id },
-      data: updateClassroomDto
+      data: updateClassroomDto,
     });
   }
 
@@ -42,7 +43,7 @@ export class ClassroomService {
     await this.findOne(id);
 
     return this.prisma.classroom.delete({
-      where: { id }
+      where: { id },
     });
   }
 }
