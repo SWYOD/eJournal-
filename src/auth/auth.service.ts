@@ -1,5 +1,5 @@
 // auth.service.ts
-import { Injectable } from '@nestjs/common';
+import {Injectable, UnauthorizedException} from '@nestjs/common';
 import { TeachersService } from '../teachers/teachers.service';
 import { JwtService } from '@nestjs/jwt';
 import { StudentsService } from '../students/students.service';
@@ -16,23 +16,25 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async getUser(username: string){
-    const student = await this.studentsService.findByUsername(username);
-    if (student) return student;
-    return await this.teachersService.findByUsername(username);
-  }
+
   async validateUser(username: string, pass: string): Promise<any> {
-    console.log('Поиск пользователя:', username);
-    // Пробуем найти пользователя в обоих сервисах
-    const user = await this.getUser(username);
-
-    if (user && (await bcrypt.compare(pass, user.password))) {
-      const { password, ...result } = user;
-      return { ...result, role };
-    }
-    return null;
+    const student = await this.studentsService.findByUsername(username);
+    if(student) return await this.validateStudent(student, pass)
+    const teacher = await this.teachersService.findByUsername(username);
+    if(teacher) return await this.validateTeacher(teacher, pass)
   }
-
+  async validateStudent(student, pass){
+    if(await bcrypt.compare(pass, student.password)){
+      const role = UserRole.STUDENT
+      return { ...student, role };
+    }
+  }
+  async validateTeacher(teacher, pass){
+    if(await bcrypt.compare(pass, teacher.password)){
+      const role = UserRole.TEACHER
+      return { ...teacher, role };
+    }
+  }
   async login(user: any) {
     const payload: JwtPayload = {
       username: user.email,
