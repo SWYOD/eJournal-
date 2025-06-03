@@ -4,8 +4,7 @@ import { TeachersService } from '../teachers/teachers.service';
 import { JwtService } from '@nestjs/jwt';
 import { StudentsService } from '../students/students.service';
 import { JwtPayload, UserRole } from './types';
-import bcrypt from 'bcrypt';
-import { Student, Teacher } from '../../generated/prisma';
+import * as bcrypt from 'bcrypt'
 
 
 @Injectable()
