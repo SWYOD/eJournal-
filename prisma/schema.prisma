@@ -67,7 +67,9 @@ model Subject {
 
 model Teacher {
   id         Int         @id @default(autoincrement())
-  name       String
+  name       String   @unique
+  email      String   @unique
+  password   String
   subjects   String
   timetables Timetable[]
 }

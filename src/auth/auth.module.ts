@@ -4,20 +4,26 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { StudentsModule } from '../students/students.module';
-import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
-import { ConfigModule } from '@nestjs/config';
+import { TeachersModule } from '../teachers/teachers.module';
+import { JwtStudentStrategy } from './strategies/jwt-student.strategy';
+import { JwtTeacherStrategy } from './strategies/jwt-teacher.strategy';
 
 @Module({
-  providers: [AuthService, LocalStrategy, JwtStrategy],
   imports: [
     PassportModule,
-    ConfigModule,
     JwtModule.register({
       secret: 'secret_key',
       signOptions: { expiresIn: '1h' },
     }),
     StudentsModule,
+    TeachersModule, // <-- Добавляем модуль преподавателей
+  ],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStudentStrategy, // <-- Новая стратегия
+    JwtTeacherStrategy, // <-- Новая стратегия
   ],
   controllers: [AuthController],
 })

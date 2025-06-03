@@ -28,6 +28,12 @@ export class TeachersService {
     return teacher;
   }
 
+  async findByUsername(email: string) {
+    return this.prisma.teacher.findUnique({
+      where: { email },
+    });
+  }
+
   async update(id: number, updateTeacherDto: UpdateTeacherDto) {
     // Проверяем существование учителя
     await this.findOne(id);

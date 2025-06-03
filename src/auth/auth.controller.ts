@@ -6,10 +6,10 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBody,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { UserRole } from './types';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -47,6 +47,15 @@ export class AuthController {
     description: 'Invalid credentials',
   })
   async login(@Request() req) {
-    return this.authService.login(req.user);
+    const { access_token, user } = await this.authService.login(req.user);
+
+    return {
+      access_token,
+      user,
+      redirectTo:
+        user.role === UserRole.STUDENT
+          ? '/student-dashboard'
+          : '/teacher-dashboard',
+    };
   }
 }

@@ -1,8 +1,22 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards} from '@nestjs/common';
-import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { TeachersService } from './teachers.service';
 import { CreateTeacherDto, UpdateTeacherDto } from './dto/teacher.dto';
-import {AuthGuard} from "@nestjs/passport";
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Teachers')
 @Controller('teachers')
@@ -40,7 +54,10 @@ export class TeachersController {
   @ApiResponse({ status: 404, description: 'Учитель не найден' })
   @UseGuards(AuthGuard('student'))
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateTeacherDto: UpdateTeacherDto) {
+  async update(
+    @Param('id') id: number,
+    @Body() updateTeacherDto: UpdateTeacherDto,
+  ) {
     return this.teacherService.update(id, updateTeacherDto);
   }
 
