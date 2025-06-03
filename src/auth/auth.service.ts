@@ -7,6 +7,7 @@ import { JwtPayload, UserRole } from './types';
 import bcrypt from 'bcrypt';
 import { Student, Teacher } from '../../generated/prisma';
 
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,17 +16,16 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
-    // Пробуем найти пользователя в обоих сервисах
+  async getUser(username: string){
     const student = await this.studentsService.findByUsername(username);
-    let role = UserRole.STUDENT;
-    let user;
-    if (!student) {
-      user = await this.teachersService.findByUsername(username);
-      role = UserRole.TEACHER;
-    } else {
-      user = student;
-    }
+    if (student) return student;
+    return await this.teachersService.findByUsername(username);
+  }
+  async validateUser(username: string, pass: string): Promise<any> {
+    console.log('Поиск пользователя:', username);
+    // Пробуем найти пользователя в обоих сервисах
+    const user = await this.getUser(username);
+
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
       return { ...result, role };
