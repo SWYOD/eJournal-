@@ -6,11 +6,10 @@ import { StudentsModule } from './students/students.module';
 import { GroupsModule } from './groups/groups.module';
 import { ClassroomModule } from './classroom/classroom.module';
 
-
-
 import { AuthModule } from './auth/auth.module';
 import { S3Module } from './s3/s3.module';
-import {PrismaModule} from "./prisma/prisma.module";
+import { PrismaModule } from './prisma/prisma.module';
+import { MarkModule } from './mark/mark.module';
 
 @Module({
   imports: [
@@ -22,7 +21,8 @@ import {PrismaModule} from "./prisma/prisma.module";
     SubjectModule,
     AuthModule,
     S3Module,
-   PrismaModule
-  ]
+    PrismaModule,
+    MarkModule,
+  ],
 })
 export class AppModule {}
