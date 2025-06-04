@@ -2,10 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   CreateTimetableDto,
   GetWeeklyTimetableDto,
-  UpdateTimetableDto
+  UpdateTimetableDto,
 } from './dto/timetable.dto';
 import { startOfWeek, endOfWeek } from 'date-fns';
-import { PrismaService } from "../prisma/prisma.service";
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class TimetableService {
@@ -18,21 +18,21 @@ export class TimetableService {
         teacher: true,
         classroom: true,
         group: true,
-        subject: true
-      }
+        subject: true,
+      },
     });
   }
 
   async findAll({
-                  page = 1,
-                  limit = 10,
-                  teacherId,
-                  classroomId,
-                  groupId,
-                  subjectId,
-                  sortBy = 'subjDate',
-                  sortOrder = 'asc'
-                }: {
+    page = 1,
+    limit = 10,
+    teacherId,
+    classroomId,
+    groupId,
+    subjectId,
+    sortBy = 'subjDate',
+    sortOrder = 'asc',
+  }: {
     page?: number;
     limit?: number;
     teacherId?: number;
@@ -42,7 +42,9 @@ export class TimetableService {
     sortBy?: 'subjDate' | 'endDate';
     sortOrder?: 'asc' | 'desc';
   }) {
+    // Убедимся, что используем UTC время для сравнения
     const now = new Date();
+    const nowUTC = new Date(now.toISOString());
 
     const where = {};
     if (teacherId) where['teacherId'] = teacherId;
@@ -61,18 +63,22 @@ export class TimetableService {
           teacher: true,
           classroom: true,
           group: true,
-          subject: true
-        }
-      })
+          subject: true,
+        },
+      }),
     ]);
 
     // Добавляем статус к каждому элементу расписания
-    const data = timetables.map(timetable => {
+    const data = timetables.map((timetable) => {
+      // Конвертируем даты из БД в Date объекты
+      const subjDate = new Date(timetable.subjDate);
+      const endDate = new Date(timetable.endDate);
+
       let status: 'current' | 'previous' | 'next';
 
-      if (now >= timetable.subjDate && now <= timetable.endDate) {
+      if (nowUTC >= subjDate && nowUTC <= endDate) {
         status = 'current';
-      } else if (now > timetable.endDate) {
+      } else if (nowUTC > endDate) {
         status = 'previous';
       } else {
         status = 'next';
@@ -80,7 +86,7 @@ export class TimetableService {
 
       return {
         ...timetable,
-        status
+        status,
       };
     });
 
@@ -91,6 +97,7 @@ export class TimetableService {
       last_page: Math.ceil(total / limit),
     };
   }
+
   async findOne(id: number) {
     const timetable = await this.prisma.timetable.findUnique({
       where: { id },
@@ -98,8 +105,8 @@ export class TimetableService {
         teacher: true,
         classroom: true,
         group: true,
-        subject: true
-      }
+        subject: true,
+      },
     });
 
     if (!timetable) {
@@ -120,18 +127,18 @@ export class TimetableService {
         groupId: groupId,
         subjDate: {
           gte: startDate,
-          lte: endDate
-        }
+          lte: endDate,
+        },
       },
       include: {
         teacher: true,
         classroom: true,
         group: true,
-        subject: true
+        subject: true,
       },
       orderBy: {
-        subjDate: 'asc'
-      }
+        subjDate: 'asc',
+      },
     });
   }
 
@@ -146,8 +153,8 @@ export class TimetableService {
         teacher: true,
         classroom: true,
         group: true,
-        subject: true
-      }
+        subject: true,
+      },
     });
   }
 
@@ -156,7 +163,7 @@ export class TimetableService {
     await this.findOne(id);
 
     return this.prisma.timetable.delete({
-      where: { id }
+      where: { id },
     });
   }
 }
