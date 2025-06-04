@@ -1,11 +1,10 @@
 // auth.service.ts
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { TeachersService } from '../teachers/teachers.service';
 import { JwtService } from '@nestjs/jwt';
 import { StudentsService } from '../students/students.service';
 import { JwtPayload, UserRole } from './types';
-import * as bcrypt from 'bcrypt'
-
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -15,22 +14,21 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-
   async validateUser(username: string, pass: string): Promise<any> {
     const student = await this.studentsService.findByUsername(username);
-    if(student) return await this.validateStudent(student, pass)
+    if (student) return await this.validateStudent(student, pass);
     const teacher = await this.teachersService.findByUsername(username);
-    if(teacher) return await this.validateTeacher(teacher, pass)
+    if (teacher) return await this.validateTeacher(teacher, pass);
   }
-  async validateStudent(student, pass){
-    if(await bcrypt.compare(pass, student.password)){
-      const role = UserRole.STUDENT
+  async validateStudent(student, pass) {
+    if (await bcrypt.compare(pass, student.password)) {
+      const role = UserRole.STUDENT;
       return { ...student, role };
     }
   }
-  async validateTeacher(teacher, pass){
-    if(await bcrypt.compare(pass, teacher.password)){
-      const role = UserRole.TEACHER
+  async validateTeacher(teacher, pass) {
+    if (await bcrypt.compare(pass, teacher.password)) {
+      const role = UserRole.TEACHER;
       return { ...teacher, role };
     }
   }

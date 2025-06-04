@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTeacherDto, UpdateTeacherDto } from './dto/teacher.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from "bcrypt";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class TeachersService {

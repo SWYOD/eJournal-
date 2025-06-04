@@ -7,12 +7,21 @@ import {
   Param,
   Delete,
   UploadedFile,
-  UseInterceptors, Query
+  UseInterceptors,
+  Query,
 } from '@nestjs/common';
-import {ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiResponse, ApiTags} from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StudentsService } from './students.service';
 import { CreateStudentDto, UpdateStudentDto } from './dto/create-student.dto';
-import {FileInterceptor} from "@nestjs/platform-express";
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Students')
 @Controller('students')
@@ -28,12 +37,12 @@ export class StudentsController {
   }
   @Get(':id/marks')
   getStudentMarks(
-      @Param('id') id: string,
-      @Query('subjectId') subjectId?: string
+    @Param('id') id: string,
+    @Query('subjectId') subjectId?: string,
   ) {
     return this.studentService.getAllStudentMarks(
-        Number(id),
-        subjectId ? Number(subjectId) : undefined
+      Number(id),
+      subjectId ? Number(subjectId) : undefined,
     );
   }
   @Post(':id/avatar')
@@ -60,8 +69,8 @@ export class StudentsController {
   @ApiResponse({ status: 400, description: 'Некорректный файл' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   async uploadAvatar(
-      @Param('id') id: number,
-      @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return this.studentService.uploadAvatar(id, file);
   }
@@ -90,8 +99,8 @@ export class StudentsController {
   @ApiResponse({ status: 400, description: 'Некорректный файл' })
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   async uploadCover(
-      @Param('id') id: number,
-      @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
   ) {
     return this.studentService.uploadCover(id, file);
   }
@@ -117,7 +126,10 @@ export class StudentsController {
   @ApiResponse({ status: 404, description: 'Студент не найден' })
   // @UseGuards(AuthGuard('student'))
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateStudentDto: UpdateStudentDto) {
+  async update(
+    @Param('id') id: number,
+    @Body() updateStudentDto: UpdateStudentDto,
+  ) {
     return this.studentService.update(id, updateStudentDto);
   }
 
