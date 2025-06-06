@@ -1,74 +1,20 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { MarkService } from './mark.service';
-import {
-  CreateMarkDto,
-  UpdateMarkDto,
-  PeriodFilterDto,
-  GroupMarksResponseDto,
-} from './dto/mark.dto';
-import { StudentGuard } from '../auth/guards/student.guard';
-import { TeacherGuard } from '../auth/guards/teacher.guard';
-
+import { MarksFilterDto } from './dto/mark.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Marks')
 @Controller('marks')
-@ApiBearerAuth()
-@UseGuards(StudentGuard, TeacherGuard)
 export class MarkController {
   constructor(private readonly markService: MarkService) {}
 
-  @ApiOperation({ summary: 'Создать оценку' })
-  @ApiResponse({ status: 201, description: 'Оценка создана' })
-
-  @Post()
-  create(@Body() createMarkDto: CreateMarkDto) {
-    return this.markService.create(createMarkDto);
-  }
-
-  @ApiOperation({ summary: 'Получить средние оценки по группе за период' })
-  @ApiResponse({
-    status: 200,
-    description: 'Средние оценки за период',
-    type: [GroupMarksResponseDto],
-  })
-
   @Get('group/:groupId/average')
-  getGroupAverageMarks(
-    @Param('groupId') groupId: number,
-    @Query() filter: PeriodFilterDto,
+  @ApiOperation({ summary: 'Получение средних оценок группы за период' })
+  @ApiResponse({ status: 200, description: 'Успешный запрос' })
+  async getGroupAverageMarks(
+    @Param('groupId') groupId: string,
+    @Query() filter: MarksFilterDto
   ) {
-    return this.markService.getGroupAverageMarks(+groupId, filter.period);
-  }
-
-  @ApiOperation({ summary: 'Обновить оценку' })
-  @ApiResponse({ status: 200, description: 'Оценка обновлена' })
-  @UseGuards(StudentGuard, TeacherGuard)
-  @Patch(':id')
-  update(@Param('id') id: number, @Body() updateMarkDto: UpdateMarkDto) {
-    return this.markService.update(+id, updateMarkDto);
-  }
-
-  @ApiOperation({ summary: 'Удалить оценку' })
-  @ApiResponse({ status: 200, description: 'Оценка удалена' })
-  @UseGuards(StudentGuard, TeacherGuard)
-  @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.markService.remove(+id);
+    return this.markService.getAverageMarks({ ...filter, groupId });
   }
 }
