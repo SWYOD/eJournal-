@@ -28,6 +28,14 @@ export class CreateMarkDto {
   @Min(1)
   @Max(5)
   value: number;
+
+  @ApiPropertyOptional({
+    description: 'Дата оценки (по умолчанию текущая)',
+    example: '2023-05-20T10:30:00Z'
+  })
+  @IsDateString()
+  @IsOptional()
+  createdAt?: string;
 }
 
 export class UpdateMarkDto {

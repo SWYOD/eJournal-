@@ -12,6 +12,7 @@ export class MarkService {
         value: dto.value,
         subjectId: dto.subjectId,
         studentId: dto.studentId,
+        createdAt: dto.createdAt ? new Date(dto.createdAt) : new Date(),
       },
       include: {
         subject: true,
