@@ -16,8 +16,8 @@ import {
 } from '@nestjs/swagger';
 import { TeachersService } from './teachers.service';
 import { CreateTeacherDto, UpdateTeacherDto } from './dto/teacher.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { StudentGuard } from '../auth/guards/student.guard';
+import { TeacherGuard } from '../auth/guards/teacher.guard';
+
 
 @ApiTags('Teachers')
 @Controller('teachers')
@@ -27,7 +27,7 @@ export class TeachersController {
 
   @ApiOperation({ summary: 'Создание учителя' })
   @ApiResponse({ status: 201, description: 'Учитель успешно создан' })
-  @UseGuards(StudentGuard)
+  //@UseGuards(TeacherGuard)
   @Post()
   async create(@Body() createTeacherDto: CreateTeacherDto) {
     return this.teacherService.create(createTeacherDto);
@@ -35,7 +35,7 @@ export class TeachersController {
 
   @ApiOperation({ summary: 'Получение всех учителей' })
   @ApiResponse({ status: 200, description: 'Возвращает список учителей' })
-  @UseGuards(StudentGuard)
+  //@UseGuards(TeacherGuard)
   @Get()
   async findAll() {
     return this.teacherService.findAll();
@@ -44,7 +44,7 @@ export class TeachersController {
   @ApiOperation({ summary: 'Получение учителя по ID' })
   @ApiResponse({ status: 200, description: 'Учитель найден' })
   @ApiResponse({ status: 404, description: 'Учитель не найден' })
-  @UseGuards(StudentGuard)
+  //@UseGuards(TeacherGuard)
   @Get(':id')
   async findOne(@Param('id') id: number) {
     return this.teacherService.findOne(id);
@@ -53,7 +53,7 @@ export class TeachersController {
   @ApiOperation({ summary: 'Обновление учителя' })
   @ApiResponse({ status: 200, description: 'Учитель обновлен' })
   @ApiResponse({ status: 404, description: 'Учитель не найден' })
-  @UseGuards(StudentGuard)
+  //@UseGuards(TeacherGuard)
   @Patch(':id')
   async update(
     @Param('id') id: number,
@@ -65,7 +65,7 @@ export class TeachersController {
   @ApiOperation({ summary: 'Удаление учителя' })
   @ApiResponse({ status: 200, description: 'Учитель удален' })
   @ApiResponse({ status: 404, description: 'Учитель не найден' })
-  @UseGuards(StudentGuard)
+  //@UseGuards(TeacherGuard)
   @Delete(':id')
   async remove(@Param('id') id: number) {
     return this.teacherService.remove(id);

@@ -63,6 +63,7 @@ model Subject {
   type       String
   timetables Timetable[]
   marks      Mark[]
+  teachers   Teacher[]
 }
 
 model Teacher {
@@ -70,7 +71,7 @@ model Teacher {
   name       String   @unique
   email      String   @unique
   password   String
-  subjects   String
+  subjects   Subject[]
   timetables Timetable[]
 }
 
