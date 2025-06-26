@@ -15,9 +15,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { TeachersService } from './teachers.service';
-import { CreateTeacherDto, UpdateTeacherDto } from './dto/teacher.dto';
+import {
+  CreateTeacherDto,
+  UpdateTeacherDto,
+  AssignSubjectsDto,
+} from './dto/teacher.dto';
 import { TeacherGuard } from '../auth/guards/teacher.guard';
-
 
 @ApiTags('Teachers')
 @Controller('teachers')
@@ -46,7 +49,7 @@ export class TeachersController {
   @ApiResponse({ status: 404, description: 'Учитель не найден' })
   //@UseGuards(TeacherGuard)
   @Get(':id')
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id') id: string) {
     return this.teacherService.findOne(id);
   }
 
@@ -56,10 +59,10 @@ export class TeachersController {
   //@UseGuards(TeacherGuard)
   @Patch(':id')
   async update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateTeacherDto: UpdateTeacherDto,
   ) {
-    return this.teacherService.update(id, updateTeacherDto);
+    return this.teacherService.update(Number(id), updateTeacherDto);
   }
 
   @ApiOperation({ summary: 'Удаление учителя' })
@@ -67,7 +70,28 @@ export class TeachersController {
   @ApiResponse({ status: 404, description: 'Учитель не найден' })
   //@UseGuards(TeacherGuard)
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    return this.teacherService.remove(id);
+  async remove(@Param('id') id: string) {
+    return this.teacherService.remove(Number(id));
+  }
+
+  @ApiOperation({ summary: 'Присвоить предметы преподавателю' })
+  @ApiResponse({
+    status: 200,
+    description: 'Предметы успешно присвоены преподавателю',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Преподаватель или предметы не найдены',
+  })
+  //@UseGuards(TeacherGuard)
+  @Post(':id/subjects')
+  async assignSubjects(
+    @Param('id') id: string,
+    @Body() assignSubjectsDto: AssignSubjectsDto,
+  ) {
+    return this.teacherService.assignSubjects(
+      Number(id),
+      assignSubjectsDto.subjectIds,
+    );
   }
 }

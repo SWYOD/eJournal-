@@ -1,5 +1,23 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { ApiProperty, ApiExtraModels } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsNotEmpty,
+} from 'class-validator';
+
+@ApiExtraModels()
+export class AssignSubjectsDto {
+  @ApiProperty({
+    example: [1, 2],
+    description: 'Массив идентификаторов предметов',
+    type: [Number],
+  })
+  @IsArray({ message: 'Должен быть массив чисел' })
+  @IsNumber({}, { each: true, message: 'Каждый элемент должен быть числом' })
+  subjectIds: number[];
+}
 
 export class CreateTeacherDto {
   @ApiProperty({ example: 'John Doe', description: 'Имя учителя' })
@@ -8,12 +26,18 @@ export class CreateTeacherDto {
   name: string;
 
   @ApiProperty({
-    example: 'Mathematics, Physics',
-    description: 'Преподаваемые предметы',
+    example: [1, 3],
+    description: 'Идентификаторы предметов',
+    type: [Number],
+    required: false,
   })
-  @IsString({ message: 'Предметы должны быть строкой' })
-  @IsNotEmpty({ message: 'Предметы не должны быть пустыми' })
-  subjects: string;
+  @IsOptional()
+  @IsArray({ message: 'Предметы должны быть массивом чисел' })
+  @IsNumber(
+    {},
+    { each: true, message: 'Каждый ID предмета должен быть числом' },
+  )
+  subjectIds?: number[];
 
   @ApiProperty({ example: '12345678', description: 'Пароль' })
   @IsString({ message: 'Пароль должен быть строкой' })
@@ -35,13 +59,20 @@ export class UpdateTeacherDto {
     required: false,
   })
   @IsString({ message: 'Имя должно быть строкой' })
+  @IsOptional()
   name?: string;
 
   @ApiProperty({
-    example: 'Chemistry, Biology',
-    description: 'Преподаваемые предметы',
+    example: [2, 4],
+    description: 'Идентификаторы предметов',
+    type: [Number],
     required: false,
   })
-  @IsString({ message: 'Предметы должны быть строкой' })
-  subjects?: string;
+  @IsOptional()
+  @IsArray({ message: 'Предметы должны быть массивом чисел' })
+  @IsNumber(
+    {},
+    { each: true, message: 'Каждый ID предмета должен быть числом' },
+  )
+  subjectIds?: number[];
 }
