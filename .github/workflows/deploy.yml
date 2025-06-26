@@ -1,0 +1,100 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  HARBOR_REGISTRY: harbor.pixelservices.ru
+  HARBOR_PROJECT: ejournal
+  IMAGE_NAME: backend
+  SERVER_HOST: 85.198.82.172
+  SERVER_USER: root
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: npm run test
+
+    - name: Build application
+      run: npm run build
+
+    - name: Login to Harbor Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.HARBOR_REGISTRY }}
+        username: ${{ secrets.HARBOR_USERNAME }}
+        password: ${{ secrets.HARBOR_PASSWORD }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: |
+          ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_PROJECT }}/${{ env.IMAGE_NAME }}:latest
+          ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_PROJECT }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ env.SERVER_HOST }}
+        username: ${{ env.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        script: |
+          # Login to Harbor
+          echo "${{ secrets.HARBOR_PASSWORD }}" | docker login ${{ env.HARBOR_REGISTRY }} -u ${{ secrets.HARBOR_USERNAME }} --password-stdin
+          
+          # Stop and remove existing container
+          docker stop ejournal-backend || true
+          docker rm ejournal-backend || true
+          
+          # Pull latest image
+          docker pull ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_PROJECT }}/${{ env.IMAGE_NAME }}:latest
+          
+          # Run database migrations (if needed)
+          docker run --rm \
+            --network ejournal-network \
+            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_PROJECT }}/${{ env.IMAGE_NAME }}:latest \
+            npx prisma migrate deploy
+          
+          # Run new container
+          docker run -d \
+            --name ejournal-backend \
+            --restart unless-stopped \
+            --network ejournal-network \
+            -p 3001:3000 \
+            -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -e AWS_REGION="${{ secrets.AWS_REGION }}" \
+            -e AWS_S3_BUCKET="${{ secrets.AWS_S3_BUCKET }}" \
+            ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_PROJECT }}/${{ env.IMAGE_NAME }}:latest
+          
+          # Clean up old images
+          docker image prune -f
