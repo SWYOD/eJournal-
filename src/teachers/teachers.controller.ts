@@ -19,6 +19,7 @@ import {
   CreateTeacherDto,
   UpdateTeacherDto,
   AssignSubjectsDto,
+  AssignGroupsDto,
 } from './dto/teacher.dto';
 import { TeacherGuard } from '../auth/guards/teacher.guard';
 
@@ -92,6 +93,27 @@ export class TeachersController {
     return this.teacherService.assignSubjects(
       Number(id),
       assignSubjectsDto.subjectIds,
+    );
+  }
+
+  @ApiOperation({ summary: 'Присвоить группы преподавателю' })
+  @ApiResponse({
+    status: 200,
+    description: 'Группы успешно присвоены преподавателю',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Преподаватель или группы не найдены',
+  })
+  //@UseGuards(TeacherGuard)
+  @Post(':id/groups')
+  async assignGroups(
+    @Param('id') id: string,
+    @Body() assignGroupsDto: AssignGroupsDto,
+  ) {
+    return this.teacherService.assignGroups(
+      Number(id),
+      assignGroupsDto.groupIds,
     );
   }
 }

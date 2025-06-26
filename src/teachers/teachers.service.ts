@@ -3,6 +3,7 @@ import {
   CreateTeacherDto,
   UpdateTeacherDto,
   AssignSubjectsDto,
+  AssignGroupsDto,
 } from './dto/teacher.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
@@ -22,14 +23,23 @@ export class TeachersService {
         subjects: createTeacherDto.subjectIds
           ? { connect: createTeacherDto.subjectIds.map((id) => ({ id })) }
           : undefined,
+        groups: createTeacherDto.groupIds
+          ? { connect: createTeacherDto.groupIds.map((id) => ({ id })) }
+          : undefined,
       },
-      include: { subjects: true },
+      include: {
+        subjects: true,
+        groups: true,
+      },
     });
   }
 
   async findAll() {
     return this.prisma.teacher.findMany({
-      include: { subjects: true },
+      include: {
+        subjects: true,
+        groups: true,
+      },
     });
   }
 
@@ -37,7 +47,10 @@ export class TeachersService {
     const teacherId = typeof id === 'string' ? Number(id) : id;
     const teacher = await this.prisma.teacher.findUnique({
       where: { id: teacherId },
-      include: { subjects: true },
+      include: {
+        subjects: true,
+        groups: true,
+      },
     });
 
     if (!teacher) {
@@ -49,7 +62,10 @@ export class TeachersService {
   async findByUsername(email: string) {
     return this.prisma.teacher.findUnique({
       where: { email },
-      include: { subjects: true },
+      include: {
+        subjects: true,
+        groups: true,
+      },
     });
   }
 
@@ -64,8 +80,15 @@ export class TeachersService {
           updateTeacherDto.subjectIds !== undefined
             ? { set: updateTeacherDto.subjectIds.map((id) => ({ id })) }
             : undefined,
+        groups:
+          updateTeacherDto.groupIds !== undefined
+            ? { set: updateTeacherDto.groupIds.map((id) => ({ id })) }
+            : undefined,
       },
-      include: { subjects: true },
+      include: {
+        subjects: true,
+        groups: true,
+      },
     });
   }
 
@@ -74,7 +97,10 @@ export class TeachersService {
 
     return this.prisma.teacher.delete({
       where: { id },
-      include: { subjects: true },
+      include: {
+        subjects: true,
+        groups: true,
+      },
     });
   }
 
@@ -101,7 +127,40 @@ export class TeachersService {
           set: subjectIds.map((id) => ({ id })),
         },
       },
-      include: { subjects: true },
+      include: {
+        subjects: true,
+        groups: true,
+      },
+    });
+  }
+
+  async assignGroups(teacherId: number, groupIds: number[]) {
+    const teacher = await this.findOne(teacherId);
+
+    const existingGroups = await this.prisma.group.findMany({
+      where: { id: { in: groupIds } },
+    });
+
+    if (existingGroups.length !== groupIds.length) {
+      const missingIds = groupIds.filter(
+        (id) => !existingGroups.some((g) => g.id === id),
+      );
+      throw new NotFoundException(
+        `Группы с ID: ${missingIds.join(', ')} не найдены`,
+      );
+    }
+
+    return this.prisma.teacher.update({
+      where: { id: teacherId },
+      data: {
+        groups: {
+          set: groupIds.map((id) => ({ id })),
+        },
+      },
+      include: {
+        subjects: true,
+        groups: true,
+      },
     });
   }
 }

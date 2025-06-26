@@ -1,22 +1,28 @@
 import { ApiProperty, ApiExtraModels } from '@nestjs/swagger';
-import {
-  IsArray,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsNotEmpty,
-} from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString, IsNotEmpty } from 'class-validator';
 
 @ApiExtraModels()
 export class AssignSubjectsDto {
   @ApiProperty({
     example: [1, 2],
     description: 'Массив идентификаторов предметов',
-    type: [Number],
+    type: [Number]
   })
   @IsArray({ message: 'Должен быть массив чисел' })
   @IsNumber({}, { each: true, message: 'Каждый элемент должен быть числом' })
   subjectIds: number[];
+}
+
+@ApiExtraModels()
+export class AssignGroupsDto {
+  @ApiProperty({
+    example: [1, 3],
+    description: 'Массив идентификаторов групп',
+    type: [Number]
+  })
+  @IsArray({ message: 'Должен быть массив чисел' })
+  @IsNumber({}, { each: true, message: 'Каждый элемент должен быть числом' })
+  groupIds: number[];
 }
 
 export class CreateTeacherDto {
@@ -29,15 +35,23 @@ export class CreateTeacherDto {
     example: [1, 3],
     description: 'Идентификаторы предметов',
     type: [Number],
-    required: false,
+    required: false
   })
   @IsOptional()
   @IsArray({ message: 'Предметы должны быть массивом чисел' })
-  @IsNumber(
-    {},
-    { each: true, message: 'Каждый ID предмета должен быть числом' },
-  )
+  @IsNumber({}, { each: true, message: 'Каждый ID предмета должен быть числом' })
   subjectIds?: number[];
+
+  @ApiProperty({
+    example: [2, 4],
+    description: 'Идентификаторы групп',
+    type: [Number],
+    required: false
+  })
+  @IsOptional()
+  @IsArray({ message: 'Группы должны быть массивом чисел' })
+  @IsNumber({}, { each: true, message: 'Каждый ID группы должен быть числом' })
+  groupIds?: number[];
 
   @ApiProperty({ example: '12345678', description: 'Пароль' })
   @IsString({ message: 'Пароль должен быть строкой' })
@@ -66,13 +80,21 @@ export class UpdateTeacherDto {
     example: [2, 4],
     description: 'Идентификаторы предметов',
     type: [Number],
-    required: false,
+    required: false
   })
   @IsOptional()
   @IsArray({ message: 'Предметы должны быть массивом чисел' })
-  @IsNumber(
-    {},
-    { each: true, message: 'Каждый ID предмета должен быть числом' },
-  )
+  @IsNumber({}, { each: true, message: 'Каждый ID предмета должен быть числом' })
   subjectIds?: number[];
+
+  @ApiProperty({
+    example: [1, 5],
+    description: 'Идентификаторы групп',
+    type: [Number],
+    required: false
+  })
+  @IsOptional()
+  @IsArray({ message: 'Группы должны быть массивом чисел' })
+  @IsNumber({}, { each: true, message: 'Каждый ID группы должен быть числом' })
+  groupIds?: number[];
 }
