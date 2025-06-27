@@ -86,7 +86,6 @@ jobs:
             --network ejournal-network \
             -p 3001:3000 \
             -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-            -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             -e TIMEWEB_ACCESS_KEY_ID="${{ secrets.TIMEWEB_ACCESS_KEY_ID }}" \
             -e TIMEWEB_SECRET_ACCESS_KEY="${{ secrets.TIMEWEB_SECRET_ACCESS_KEY }}" \
             -e TIMEWEB_REGION="${{ secrets.TIMEWEB_REGION }}" \
