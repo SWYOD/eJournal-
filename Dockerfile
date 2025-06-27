@@ -1,55 +1,56 @@
-# Build stage
-FROM node:18-alpine AS build
+# Шаг 1: Сборка приложения
+FROM node:18-alpine AS builder
 
+# Установка системных зависимостей для сборки
+RUN apk add --no-cache \
+    git \
+    python3 \
+    make \
+    g++ \
+    pkgconfig \
+    cairo-dev \
+    pango-dev \
+    libjpeg-turbo-dev \
+    giflib-dev
+
+# Создание рабочей директории
 WORKDIR /app
 
-# Copy package files
+# Копируем файлы зависимостей
 COPY package*.json ./
+COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm ci --only=production
+# Устанавливаем зависимости (включая dev)
+RUN npm ci
 
-# Copy source code
+# Копируем все файлы проекта
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate
-
-# Build the application
+# Собираем приложение
 RUN npm run build
 
-# Production stage
-FROM node:18-alpine AS production
+# Шаг 2: Продакшен образ
+FROM node:18-alpine
 
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Установка runtime зависимостей
+RUN apk add --no-cache \
+    cairo \
+    pango \
+    libjpeg-turbo \
+    giflib \
+    bash \
+    openssl
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
-
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
-
-# Copy built application and prisma
-COPY --from=build --chown=nestjs:nodejs /app/dist ./dist
-COPY --from=build --chown=nestjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --chown=nestjs:nodejs prisma ./prisma
-
-# Switch to non-root user
-USER nestjs
-
-# Expose port
+# Копируем артефакты сборки
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/generated ./generated
+# Экспонируем порт
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node dist/health-check.js || exit 1
-
-# Start the application
-CMD ["dumb-init", "node", "dist/main"]
+# Команда запуска приложения
+CMD ["npm", "run", "start:prod"]
