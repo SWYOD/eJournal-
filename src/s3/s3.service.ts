@@ -18,18 +18,18 @@ export class S3Service {
     private readonly bucketName: string;
     private readonly logger = new Logger(S3Service.name);
 
-    constructor() {
-        this.s3Client = new S3Client({
-            region: process.env.TIMEWEB_REGION || 'ru-1',
-            endpoint: process.env.TIMEWEB_ENDPOINT || 'https://s3.timeweb.cloud',
-            credentials: {
-                accessKeyId: process.env.TIMEWEB_ACCESS_KEY_ID,
-                secretAccessKey: process.env.TIMEWEB_SECRET_ACCESS_KEY,
-            },
-            forcePathStyle: true,
-        });
-        this.bucketName = process.env.TIMEWEB_BUCKET || '30489bee-ejournal';
-    }
+  constructor() {
+    this.s3Client = new S3Client({
+      region: 'ru-1',
+      endpoint: 'https://s3.timeweb.cloud',
+      credentials: {
+        accessKeyId: 'WON9ZMZBE1JHXMUV4ZWC',
+        secretAccessKey: 'DXlnQAlJdGFkVlW3ElXPXQCeKkAnQZDsLKDj4P2k',
+      },
+      forcePathStyle: true,
+    });
+    this.bucketName = '30489bee-ejournal';
+  }
 
     private generateUniqueKey(originalName: string): string {
         const key = transliteration.slugify(originalName);
