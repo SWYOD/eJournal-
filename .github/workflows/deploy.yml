@@ -90,10 +90,10 @@ jobs:
             -p 3001:3000 \
             -e DATABASE_URL="${{ secrets.DATABASE_URL }}" \
             -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
-            -e AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}" \
-            -e AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -e AWS_REGION="${{ secrets.AWS_REGION }}" \
-            -e AWS_S3_BUCKET="${{ secrets.AWS_S3_BUCKET }}" \
+            -e TIMEWEB_ACCESS_KEY_ID="${{ secrets.TIMEWEB_ACCESS_KEY_ID }}" \
+            -e TIMEWEB_SECRET_ACCESS_KEY="${{ secrets.TIMEWEB_SECRET_ACCESS_KEY }}" \
+            -e TIMEWEB_REGION="${{ secrets.TIMEWEB_REGION }}" \
+            -e TIMEWEB_ENDPOINT="${{ secrets.TIMEWEB_ENDPOINT }}" \
             ${{ env.HARBOR_REGISTRY }}/${{ env.HARBOR_PROJECT }}/${{ env.IMAGE_NAME }}:latest
           
           # Clean up old images
